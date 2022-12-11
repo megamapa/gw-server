@@ -4,7 +4,7 @@
   "description": "Great Will Server",
   "main": "gw-server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node src/gw-server.js"
   },
   "repository": {
     "type": "git",
