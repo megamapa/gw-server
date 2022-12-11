@@ -46,17 +46,6 @@ npm install
 3. Create DB files in MySQL server:
 
 ```sh
-root@server:~# mysql -u root
-Welcome to the MySQL monitor.  Commands end with ; or \g.
-Your MySQL connection id is 10
-Server version: 8.0.31-0ubuntu0.20.04.2 (Ubuntu)
-
-Copyright (c) 2000, 2022, Oracle and/or its affiliates.
-
-Oracle is a registered trademark of Oracle Corporation and/or its
-affiliates. Other names may be trademarks of their respective
-owners.
-
 mysql> CREATE USER 'gw_us'@'localhost' IDENTIFIED BY 'P@s$w0rd123!';
 mysql> GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'gw_us'@'localhost' WITH GRANT OPTION;
 mysql> CREATE DATABASE gw_db;
@@ -76,7 +65,7 @@ SrvPort = 50910
 DB_host = "127.0.0.1"
 DB_name = "gw_db"
 DB_user = "gw_us"
-DB_pass = "secret123"
+DB_pass = "P@s$w0rd123!"
 
 # Redis database
 RD_host = "127.0.0.1"
