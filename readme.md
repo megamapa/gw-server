@@ -46,7 +46,10 @@ npm install
 3. Create DB files in MySQL server:
 
 ```sh
-create dbsql.sql
+mysql> GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'gw_us'@'localhost' WITH GRANT OPTION;
+mysql> CREATE DATABASE gw_db;
+mysql> use gw_db;
+mysql> source src/gw_db.sql;
 ```
 
 4. Create file ".env" and fill constants:
@@ -55,13 +58,13 @@ create dbsql.sql
 
 # IP and port
 SrvIP = 127.0.0.1
-SrvPort = 99999
+SrvPort = 50910
 
 # MySQL database
 DB_host = "127.0.0.1"
 DB_name = "gw_db"
 DB_user = "gw_us"
-DB_pass = "*******"
+DB_pass = "P@s$w0rd123!"
 
 # Redis database
 RD_host = "127.0.0.1"
