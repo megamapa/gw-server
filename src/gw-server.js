@@ -1,7 +1,7 @@
 /********************************************************/
-/*														*/
-/* Para executar use: node gw-server.js &				*/
-/*														*/
+/*                                                      */
+/* Para executar use: node gw-server.js &               */
+/*                                                      */
 /********************************************************/
 process.title = 'gw-server';
 Version = 'V1.0.0';
@@ -35,6 +35,52 @@ async function SendCmd(device,cmd){
 	device.msgout++;
 	bytsout+=cmd.length;
 	msgsout++;
-	// Envia log
+	// send log
 	writelog(device.id,'S',cmd);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Update statistics
+var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0;
+setInterval(function(){
+			// Grava
+			db.getConnection(function(err,connection){
+				if (!err) {
+					connection.query('INSERT INTO sysmtr (protocol,devices,msgsin,msgsout,bytsin,bytsout) VALUES (?,?,?,?,?,?)',['SG/HQ', numdev, msgsin, msgsout, bytsin, bytsout],function (err, result) {connection.release(); if (err) err => console.error(err);});
+				}
+				msgsin=0;
+				msgsout=0;
+				bytsin=0;
+				bytsout=0;
+			});
+},60000);
+
+// Read enviroment variables
+const dotenv = require('dotenv');
+dotenv.config("config.env");
+
+// Create and open MySQL conection
+const mysql = require('mysql');
+const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
+
+
+// Show parameters and wating clients
+const OS = require('os');
+console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
+console.log('\033[1;30m'+GetDate()+': \033[0;31m' + process.title + ' ('+Version+')');
+console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
+console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'Process: '+OS.cpus().length);
+console.log('\033[1;30m'+GetDate()+': \033[0;31m================================\033[0;0m');
