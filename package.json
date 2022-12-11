@@ -2,9 +2,9 @@
   "name": "gw-server",
   "version": "1.0.0",
   "description": "Great Will Server",
-  "main": "index.js",
+  "main": "gw-server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node src/gw-server.js"
   },
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "gw02",
     "gw03"
   ],
-  "author": "Great Will",
+  "author": "MegaMapa",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/megamapa/gw-server/issues"
