@@ -49,7 +49,7 @@ npm install
 create dbsql.sql
 ```
 
-4. Create file "config.env" and fill constants:
+4. Create file ".env" and fill constants:
 
 ```sh
 
@@ -64,7 +64,7 @@ DB_user = "gw_us"
 DB_pass = "*******"
 ```
 
-## Run app locally
+## Run app
 ```sh
 npm run server
 ```
