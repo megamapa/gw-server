@@ -22,7 +22,7 @@
 The gw-server is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
 If you need more information about this devices please visit [Great Will home page](https://www.gpstracker-factory.com/mobile-digital-video-recorders/)
 ## Requirements
-- Node.js
+- Node.js (v18.12.1)
 - Git
 - NPM
 - REDIS
@@ -41,6 +41,27 @@ git clone https://github.com/megamapa/gw-server
 
 ```sh
 npm install
+```
+
+3. Create DB files in MySQL server:
+
+```sh
+create dbsql.sql
+```
+
+4. Create file "config.env" and fill constants:
+
+```sh
+
+# IP and port
+SrvIP = "127.0.0.1"
+SrvPort = 99999
+
+# SQL database
+DB_host = "127.0.0.1"
+DB_name = "gw_db"
+DB_user = "gw_us"
+DB_pass = "*******"
 ```
 
 ## Run app locally
