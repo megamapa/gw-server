@@ -54,7 +54,7 @@ create dbsql.sql
 ```sh
 
 # IP and port
-SrvIP = "127.0.0.1"
+SrvIP = 127.0.0.1
 SrvPort = 99999
 
 # SQL database
@@ -62,6 +62,10 @@ DB_host = "127.0.0.1"
 DB_name = "gw_db"
 DB_user = "gw_us"
 DB_pass = "*******"
+
+# Redis database
+RD_host = "127.0.0.1"
+RD_Port = 6379
 
 # Debug
 ShowLog = true
