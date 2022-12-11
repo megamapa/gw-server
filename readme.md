@@ -62,6 +62,10 @@ DB_host = "127.0.0.1"
 DB_name = "gw_db"
 DB_user = "gw_us"
 DB_pass = "*******"
+
+# Debug
+ShowLog = true
+
 ```
 
 ## Run app
