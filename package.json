@@ -11,8 +11,9 @@
     "url": "git+https://github.com/megamapa/gw-server.git"
   },
   "keywords": [
-    "gw02",
-    "gw03"
+    "GW-GR02",
+    "GW-GR03",
+    "GW-GR06"
   ],
   "author": "MegaMapa",
   "license": "ISC",
