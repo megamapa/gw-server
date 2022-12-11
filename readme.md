@@ -57,7 +57,7 @@ create dbsql.sql
 SrvIP = 127.0.0.1
 SrvPort = 99999
 
-# SQL database
+# MySQL database
 DB_host = "127.0.0.1"
 DB_name = "gw_db"
 DB_user = "gw_us"
