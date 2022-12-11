@@ -46,7 +46,6 @@ npm install
 3. Create DB files in MySQL server:
 
 ```sh
-mysql> CREATE USER 'gw_us'@'localhost' IDENTIFIED BY 'P@s$w0rd123!';
 mysql> GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'gw_us'@'localhost' WITH GRANT OPTION;
 mysql> CREATE DATABASE gw_db;
 mysql> use gw_db;
