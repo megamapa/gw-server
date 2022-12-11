@@ -1,7 +1,7 @@
 /********************************************************/
-/*							*/
-/* Para executar use: node gw-server.js &	*/
-/*							*/
+/*														*/
+/* Para executar use: node gw-server.js &				*/
+/*														*/
 /********************************************************/
 process.title = 'gw-server';
 Version = 'V1.0.0';
