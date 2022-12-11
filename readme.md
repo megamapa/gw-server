@@ -1,6 +1,6 @@
 # [gw-server for node.js](https://github.com/megamapa/gw-server)
 
-gw-server is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
+The gw-server is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
 If you need more information about this devices please visit [Great Will home page](https://www.gpstracker-factory.com/mobile-digital-video-recorders/)
 ## Requirements
 - Node.js
