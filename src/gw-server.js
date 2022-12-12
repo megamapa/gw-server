@@ -74,6 +74,15 @@ class Tracker {
 		numdev++;
 	}
 
+	async pubTracker(id,str) {
+		// Verifica se a chave existe indicando que o cliente ainda esta conectado
+		cfg.exists('id:'+id, function (err, result) {
+			if (result==1) {
+				cfg.publish('dev:'+id,'{"did":"'+id+'",'+str+'}');
+			};
+		});
+	}
+
 	async incomingTracker(data){
 		this.bytin+=data.length;
 		bytsin+=data.length;
@@ -149,4 +158,5 @@ console.log('\033[1;30m'+GetDate()+': \033[0;31m================================
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'APP : ' + process.title + ' ('+Version+')');
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'Process: '+ OS.cpus().length);
-console.log('\033[1;30m'+GetDate()+': \033[0;31m================================\033[0;0m');
+console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
+console.log('\033[1;30m'+GetDate()+': \033[0;31msWaiting clients...\033[0;0m');

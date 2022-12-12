@@ -34,7 +34,7 @@ If you need more information about this devices please visit [Target Star home p
 
 ## Getting started
 
-> NOTE: This guide presumes you already have Node, NPM, GIT, REDIS and MySQL installed
+> NOTE: This guide presumes you already have Node, NPM, GIT, REDIS and MySQL installed.
 
 1. Clone the [gw-server](https://github.com/megamapa/gw-server):
 
@@ -58,7 +58,7 @@ mysql> use gw_db;
 mysql> source src/gw_db.sql;
 ```
 
-4. Create file ".env" and fill constants or rename "variable.sample.env":
+4. Create file ".env" and fill constants or rename "variables.sample.env":
 
 ```sh
 
