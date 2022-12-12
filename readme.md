@@ -5,10 +5,11 @@
 <div align="center">
   <table cellpadding="5" cellspacing="0" border="0" align="center">
     <tr>
+      <td><a href="https://targestar.com/"><img src="https://targestar.com/wp-content/uploads/2022/10/Targestar-favicon.png" width="200px"/></a></td>
       <td><a href="https://www.gpstracker-factory.com/"><img src="https://www.gpstracker-factory.com/wp-content/uploads/2018/05/logo.png" width="200px"/></a></td>
     </tr>
     <tr>
-      <td align="center">
+      <td colspan=2 align="center">
         <a href="https://github.com/sponsors/coreybutler"><img src="https://img.shields.io/github/sponsors/megamapa?label=Individual%20Sponsors&logo=github&style=social"/></a>
         &nbsp;<a href="https://github.com/sponsors/megamapa"><img src="https://img.shields.io/badge/-Become%20a%20Sponsor-yellow"/></a>
       </td>

@@ -93,7 +93,7 @@ class Tracker {
 					connection.query('INSERT INTO devlog (did,login,bytin,bytout,msgin,msgout) VALUES (?,?,?,?,?,?)', [th.id, th.login, th.bytin, th.bytout, th.msgin, th.msgout], function (err, result) { connection.release(); if (err) { err => console.error(err); } });
 				}
 			});
-			// Envia log
+			// Send log
 			writelog(th.id,'O','Logout: '+th.err);
 			numdev--;
 		}	
@@ -130,20 +130,20 @@ setInterval(function(){
 const dotenv = require('dotenv');
 dotenv.config();
 
-// Create and open Redis
+// Create and open Redis connection
 const Redis = require('ioredis');
 const cfg = new Redis({ host: process.env.RD_host, port: process.env.RD_port, showFriendlyErrorStack: true });
 
-// Create and open MySQL conection
+// Create and open MySQL connection
 const mysql = require('mysql');
 const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
 
-// Create and open server
+// Create and open server connection
 const net = require('net');
 const server = net.createServer(OpenSocket);
 server.listen(process.env.SrvPort, process.env.SrvIP);
 
-// Show parameters and wating clients
+// Show parameters and waiting clients
 const OS = require('os');
 console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'APP : ' + process.title + ' ('+Version+')');
