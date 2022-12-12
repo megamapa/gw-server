@@ -21,8 +21,9 @@
 ## Overview
 
 The gw-server is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
-If you need more information about this devices please visit [Target Star home page](https://targestar.com/)
-![NVM for Windows](https://github.com/megamapa/img/gw-server-1.0.0-screenshot.png)
+If you need more information about this devices please visit [Target Star home page.](https://targestar.com/)
+
+![gw-server for node](https://github.com/megamapa/gw-server/blob/main/img/gw-server-1.0.0-screenshot.png.png)
 
 ## Requirements
 - Node.js (v18.12.1)
