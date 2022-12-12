@@ -20,20 +20,21 @@
 
 ## Overview
 
-The gw-server is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
+The GW-SERVER is a server made in [Node](https://nodejs.dev/en/) to work with Mobile DVR: GW-GR02,GW-GR03,GW-GR06.
 If you need more information about this devices please visit [Target Star home page.](https://targestar.com/)
 
 ![gw-server for node](https://github.com/megamapa/gw-server/blob/main/img/gw-server-1.0.0-screenshot.png.png)
 
 ## Requirements
-- Node.js (v18.12.1)
-- NPM
-- GIT
-- REDIS
+- [Node.js (v18.12.1)](https://nodejs.dev/en/)
+- [NPM](https://github.com/npm/cli)
+- [GIT](https://git-scm.com/downloads)
+- [REDIS](https://github.com/redis/redis)
+- [MySQL](https://www.mysql.com/)
 
 ## Getting started
 
-> NOTE: This guide presumes you already have Node, NPM, GIT and REDIS installed
+> NOTE: This guide presumes you already have Node, NPM, GIT, REDIS and MySQL installed
 
 1. Clone the [gw-server](https://github.com/megamapa/gw-server):
 
