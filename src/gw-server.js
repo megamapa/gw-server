@@ -1,5 +1,5 @@
 /********************************************************/
-/*                                                      */
+/* GW-SERVER                                            */
 /* Para executar use: node gw-server.js &               */
 /*                                                      */
 /********************************************************/
@@ -25,7 +25,9 @@ async function writelog(id,kind,log) {
 		};
 	});
 	// Show Log in terminal
-	if (process.env.ShowLog) { console.log('\033[1;30m'+GetDate()+': \033[0;0m'+log);}
+	if (process.env.ShowLog) {
+		console.log('\033[1;30m'+GetDate()+': '+((kind=='S')?'\033[0;32m':'\033[0;20m')+log);
+	}
 }
 
 async function SendCmd(device,cmd){
@@ -115,19 +117,20 @@ function OpenSocket(socket) {
 	
 	socket.on('data',function(data){device.incomingTracker(data);});
 	socket.on('close',async function(){await device.closeTracker(); delete device;});
-	socket.on('end',function(){device.err='0-End'; device.usocket.destroy();});
+	socket.on('end',function(){device.err='0-Normal End'; device.usocket.destroy();});
 	socket.on('error',function(){device.err='1-Error'; device.usocket.destroy();});
 	// Close connection when inactive (5 min)
 	socket.setTimeout(300000,function(){device.err='2-Timeout'; device.usocket.destroy();});
 }
 
 // Update statistics
-var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0;
+var numdev=0,msgserr=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0;
 setInterval(function(){ 
 			db.getConnection(function(err,connection){
 				if (!err) {
-					connection.query('INSERT INTO sysmtr (protocol,devices,msgsin,msgsout,bytsin,bytsout) VALUES (?,?,?,?,?,?)',['GW', numdev, msgsin, msgsout, bytsin, bytsout],function (err, result) {connection.release(); if (err) err => console.error(err);});
+					connection.query('INSERT INTO sysmtr (protocol,devices,msgserr,msgsin,msgsout,bytsin,bytsout) VALUES (?,?,?,?,?,?)',['GW', numdev, msgserr, msgsin, msgsout, bytsin, bytsout],function (err, result) {connection.release(); if (err) err => console.error(err);});
 				}
+				msgserr=0;
 				msgsin=0;
 				msgsout=0;
 				bytsin=0;
@@ -159,4 +162,4 @@ console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'APP : ' + process.title + '
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
 console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'Process: '+ OS.cpus().length);
 console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
-console.log('\033[1;30m'+GetDate()+': \033[0;31msWaiting clients...\033[0;0m');
+console.log('\033[1;30m'+GetDate()+': \033[0;31mWaiting clients...\033[0;0m');
