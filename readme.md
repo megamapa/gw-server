@@ -86,6 +86,12 @@ ShowLog = true
 npm run server
 ```
 
+## Documentation
+
+If you want to go deeper, the [doc/][def] folder contains the protocols for communication between the server and the device.
+
 ## Author & support
 
 This package was created by [MegaMapa](http://megamapa.com/) but hopefully developed and maintained by [Great Will](https://www.gpstracker-factory.com/) and others.
+
+[def]: https://github.com/megamapa/gw-server/tree/main/docs
