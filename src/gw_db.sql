@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.9.7
--- https://www.phpmyadmin.net/
---
--- Host: localhost:3306
--- Tempo de geração: 11-Dez-2022 às 17:03
--- Versão do servidor: 10.3.36-MariaDB-cll-lve
--- versão do PHP: 7.4.33
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -19,7 +10,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `tkin_gw_db`
+-- Banco de dados: `gw_db`
 --
 
 -- --------------------------------------------------------
@@ -47,6 +38,7 @@ CREATE TABLE `devlog` (
 CREATE TABLE `sysmtr` (
   `protocol` varchar(16) NOT NULL,
   `devices` int(8) NOT NULL,
+  `msgserr` int(8) NOT NULL,
   `msgsin` int(8) NOT NULL,
   `msgsout` int(8) NOT NULL,
   `bytsin` int(8) NOT NULL,
