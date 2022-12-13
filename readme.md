@@ -39,7 +39,7 @@ If you need more information about this devices please visit [Target Star home p
 1. Clone the [gw-server](https://github.com/megamapa/gw-server):
 
 ```sh
-git clone https://github.com/megamapa/gw-server
+git clone https://github.com/megamapa/gw-server && cd gw-server
 ```
 
 2. Install the required Node dependencies:
