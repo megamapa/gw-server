@@ -6,41 +6,31 @@
 process.title = 'gw-server';
 Version = 'V1.0.0';
 
-function GetDate() {
-	offset = new Date(new Date().getTime()).getTimezoneOffset();
-	return new Date(new Date().getTime() - (offset*60*1000)).toISOString().replace(/T/,' ').replace(/\..+/, '');
-}
-
-function FormatDate() {
+async function FormatDate() {
 	function ii(i, len) { var s = i + ""; len = len || 2; while (s.length < len) s = "0" + s; return s; }
 	date = new Date();
 	return date.getFullYear()+ii(date.getMonth()+1)+ii(date.getDate())+ii(date.getHours())+ii(date.getMinutes())+ii(date.getSeconds());
 }
 
-async function writelog(id,kind,log) {
+async function GetDate() {
+	offset = new Date(new Date().getTime()).getTimezoneOffset();
+	return new Date(new Date().getTime() - (offset*60*1000)).toISOString().replace(/T/,' ').replace(/\..+/, '');
+}
+
+async function WriteLog(did,kind,log) {
+	// Get date and time
+	let dte = await GetDate();
 	// Verifica se a chave existe indicando que o cliente ainda esta conectado
-	cfg.exists('log:'+id, function (err, result) {
+	cfg.exists('log:'+did, function (err, result) {
 		if (result==1) {
-			cfg.publish('log:'+id,GetDate()+': '+log);
+			cfg.publish('log:'+did,dte+': '+log);
 		};
 	});
 	// Show Log in terminal
-	if (process.env.ShowLog) {
-		console.log('\033[1;30m'+GetDate()+': '+((kind=='S')?'\033[0;32m':'\033[0;20m')+log);
+	if (ShowLog) {
+		console.log('\033[1;30m'+dte+': '+((kind=='S')?'\033[0;32m':'\033[0;20m')+log);
 	}
 }
-
-async function SendCmd(device,cmd){
-	device.usocket.write(cmd);
-	// Update counters
-	device.bytout+=cmd.length;
-	device.msgout++;
-	bytsout+=cmd.length;
-	msgsout++;
-	// send log
-	writelog(device.id,'S',cmd);
-}
-
 
 /****************************************************************************************************/
 /* Classe Tracker																					*/
@@ -49,7 +39,7 @@ class Tracker {
 
 	constructor(socket) {
 		this.usocket=socket;
-		this.id='';
+		this.did='';
 		this.login=0;
 		this.bytin=0;
 		this.bytout=0;
@@ -69,58 +59,82 @@ class Tracker {
 		this.sig=0;
 	}
 
-	async initTracker(id) {
+	async pubTracker(did,str) {
+		// Verifica se a chave existe indicando que o cliente ainda esta conectado
+		cfg.exists('did:'+did, function (err, result) {
+			if (result==1) {
+				cfg.publish('did:'+did,'{"did":"'+did+'",'+str+'}');
+			};
+		});
+	}
+
+	async initTracker(did) {
 		// Update counters and ID
-		this.id=id;
+		this.did=did;
 		this.login = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
 		numdev++;
 	}
 
-	async pubTracker(id,str) {
-		// Verifica se a chave existe indicando que o cliente ainda esta conectado
-		cfg.exists('id:'+id, function (err, result) {
-			if (result==1) {
-				cfg.publish('dev:'+id,'{"did":"'+id+'",'+str+'}');
-			};
-		});
+	async closeTracker(){
+		// Verifica se a conexão foi de um device
+		if (this.did!=='') {
+			let th=this;
+			// Publish
+			this.pubTracker(th.did,'"type":"close","err":"'+th.err+'"').catch(err => console.error(err)); 
+			// Grava log da conexão do device
+			db.getConnection(function (err, connection) {
+				if (!err) {
+					connection.query('INSERT INTO devlog (did,login,bytin,bytout,msgin,msgout) VALUES (?,?,?,?,?,?)', [th.did, th.login, th.bytin, th.bytout, th.msgin, th.msgout], function (err, result) { connection.release(); if (err) { err => console.error(err); } });
+				}
+			});
+			// Send log
+			WriteLog(th.did,'O','Logout: '+th.err);
+			numdev--;
+		}	
+	}
+
+	async sendTracker(cmd){
+
+
+
+		
+		this.usocket.write(cmd);
+		// Update counters
+		this.bytout+=cmd.length;
+		this.msgout++;
+		bytsout+=cmd.length;
+		msgsout++;
+		// send log
+		WriteLog(this.did,'S',cmd);
 	}
 
 	async incomingTracker(data){
 		this.bytin+=data.length;
 		bytsin+=data.length;
+		let th=this;
+		// Processa os dados do buffer
+		while (data.length > 0) {
+			if (data[0]===0x7e) {
+				let i=data.indexOf(0x7e);
 
 
-	}
-
-	async closeTracker(){
-		// Verifica se a conexão foi de um device
-		if (this.id!=='') {
-			let th=this;
-			// Publica
-			this.pubTracker(th.id,'"type":"close","err":"'+th.err+'"').catch(err => console.error(err)); 
-			// Grava log da conexão do device
-			db.getConnection(function (err, connection) {
-				if (!err) {
-					connection.query('INSERT INTO devlog (did,login,bytin,bytout,msgin,msgout) VALUES (?,?,?,?,?,?)', [th.id, th.login, th.bytin, th.bytout, th.msgin, th.msgout], function (err, result) { connection.release(); if (err) { err => console.error(err); } });
-				}
-			});
-			// Send log
-			writelog(th.id,'O','Logout: '+th.err);
-			numdev--;
-		}	
+				// Publish
+				this.pubTracker(th.did,'"type":"data"').catch(err => console.error(err));
+			} else  { data = data.slice(1); }
+		} 
 	}
 }
 
 // Initialize new connection
-function OpenSocket(socket) {
+async function OpenSocket(socket) {
 	const device=new Tracker(socket);
 	
-	socket.on('data',function(data){device.incomingTracker(data);});
-	socket.on('close',async function(){await device.closeTracker(); delete device;});
-	socket.on('end',function(){device.err='0-Normal End'; device.usocket.destroy();});
-	socket.on('error',function(){device.err='1-Error'; device.usocket.destroy();});
+	socket.on('data',function(data){ device.incomingTracker(data); });
+	socket.on('close',async function(){ await device.closeTracker(); delete device; });
+	socket.on('end',function(){ device.err='0-Normal End'; device.usocket.destroy(); });
+	socket.on('error',function(){ device.err = '1-Error'; device.usocket.destroy(); });
 	// Close connection when inactive (5 min)
-	socket.setTimeout(300000,function(){device.err='2-Timeout'; device.usocket.destroy();});
+	socket.setTimeout(300000,function(){ device.err='2-Timeout'; device.usocket.destroy(); });
 }
 
 // Update statistics
@@ -142,6 +156,9 @@ setInterval(function(){
 const dotenv = require('dotenv');
 dotenv.config();
 
+// Initialize debug enviroment
+const ShowLog = process.env.ShowLog || false;
+
 // Create and open Redis connection
 const Redis = require('ioredis');
 const cfg = new Redis({ host: process.env.RD_host, port: process.env.RD_port, showFriendlyErrorStack: true });
@@ -157,9 +174,10 @@ server.listen(process.env.SrvPort, process.env.SrvIP);
 
 // Show parameters and waiting clients
 const OS = require('os');
-console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
-console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'APP : ' + process.title + ' ('+Version+')');
-console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
-console.log('\033[1;30m'+GetDate()+': \033[0;31m' + 'Process: '+ OS.cpus().length);
-console.log('\033[1;30m'+GetDate()+': \033[0;31m================================');
-console.log('\033[1;30m'+GetDate()+': \033[0;31mWaiting clients...\033[0;0m');
+GetDate().then(dte => {
+	console.log('\033[1;30m'+dte+': \033[0;31m================================');
+	console.log('\033[1;30m'+dte+': \033[0;31m' + 'APP : ' + process.title + ' ('+Version+')');
+	console.log('\033[1;30m'+dte+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
+	console.log('\033[1;30m'+dte+': \033[0;31m' + 'Process: '+ OS.cpus().length);
+	console.log('\033[1;30m'+dte+': \033[0;31m================================');
+	console.log('\033[1;30m'+dte+': \033[0;31mWaiting clients...\033[0;0m');});
