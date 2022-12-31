@@ -32,23 +32,19 @@ CREATE TABLE `devlog` (
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `sysmtr`
+-- Estrutura da tabela `syslog`
 --
 
-CREATE TABLE `sysmtr` (
+CREATE TABLE `syslog` (
   `protocol` varchar(16) NOT NULL,
   `devices` int(8) NOT NULL,
-  `msgserr` int(8) NOT NULL,
   `msgsin` int(8) NOT NULL,
   `msgsout` int(8) NOT NULL,
   `bytsin` int(8) NOT NULL,
   `bytsout` int(8) NOT NULL,
+  `bytserr` int(8) NOT NULL,
   `datlog` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Índices para tabelas despejadas
---
 
 --
 -- Índices para tabela `devlog`
