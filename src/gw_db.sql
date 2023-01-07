@@ -36,14 +36,16 @@ CREATE TABLE `devlog` (
 --
 
 CREATE TABLE `syslog` (
-  `protocol` varchar(16) NOT NULL,
+  `datlog` timestamp NOT NULL DEFAULT current_timestamp(),
+  `server` varchar(16) NOT NULL,
+  `version` varchar(16) NOT NULL,
+  `ipport` varchar(16) NOT NULL,
   `devices` int(8) NOT NULL,
   `msgsin` int(8) NOT NULL,
   `msgsout` int(8) NOT NULL,
   `bytsin` int(8) NOT NULL,
   `bytsout` int(8) NOT NULL,
-  `bytserr` int(8) NOT NULL,
-  `datlog` timestamp NOT NULL DEFAULT current_timestamp()
+  `bytserr` int(8) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
