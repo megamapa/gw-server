@@ -11,9 +11,9 @@ async function GetDate() {
 }
 
 /****************************************************************************************************/
-/* Classe Tracker																					*/
+/* Classe Device																					*/
 /****************************************************************************************************/
-class Tracker {
+class Device {
 
 	constructor(socket) {
 		this.usocket=socket;
@@ -40,18 +40,16 @@ class Tracker {
 		this.sig=0;
 	}
 
-	async SendLog(logtype,log) {
+	// Publish log
+	async PublishLog(logtype,log) {
 		function hh(ii) {return log[ii].toString(16)}
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		// Verifica se a chave existe indicando que o cliente ainda esta conectado
 		hub.exists('log:'+this.did, function (err, result) {
-			if (result==1) {
-				if (logtype==0) {
-					// Publish
-					hub.publish('log:'+this.did,'<div class=datetime>'+GetDate()+': </div>'+log);
-				} else {
+			if (result==0) {
+				if (logtype) {
 					// Cria html para o header
-					let str = '<div class=datetime>'+GetDate()+': </div>';
+					let str = '<p><div class=datetime>'+GetDate()+': </div>';
 					str+='<div class=identification>'+hh(0)+'</div><div class=packtype>'+hh(1)+hh(2)+'</div><div class=packlength>'+hh(3)+hh(4)+'</div><div class=terminalnumber>'+hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10)+'</div>';
 					str+='<div class=messageserial>'+hh(11)+hh(12)+'</div>';
 					// Cria html para o body
@@ -59,45 +57,56 @@ class Tracker {
 					switch (pkgtype) {
 						case 0x0704 : // Upload location data in batches
 							break;
-						
+											
 						case 0x0102 : // Terminal autentication
 							break;
-	
-						case 0x0100 : // Terminal registration
 						
+						case 0x0100 : // Terminal registration
 							break;
-	
+						
 					}
-					str+='<div class=checkdigit>'+hh(log.length=1)+'</div><div class=identification>'+hh(log.length)+'</div>';
-					// Publish
+					str+='<div class=checkdigit>'+hh(log.length-1)+'</div><div class=identification>'+hh(log.length)+'</div></p>';
+					// Publish data
 					hub.publish('log:'+this.did,str);
+				} else {
+					// Publish text
+					hub.publish('log:'+this.did,'<p><div class=datetime>'+GetDate()+': </div>'+log+'</p>');
 				};
 			};
 		});
 	}
 
-	async PubTracker(str) {
+	async PublishDevice(str) {
 		// Verifica se a chave existe indicando que o cliente ainda esta conectado
 		hub.exists('did:'+this.did, function (err, result) {
-			if (result==1) {
+			if (result) {
 				hub.publish('did:'+this.did,'{"did":"'+this.did+'",'+str+'}');
 			};
 		});
 	}
 
-	async SendTracker(buff){
+	async InitDevice(did) {
+		// Update ID and login datetime
+		this.did = did;
+		this.login = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
+		// Publish login
+		this.PublishDevice('"dte":"'+this.login+'","type":"login"').catch(err => console.error(err));
+		// Publish log
+		this.PublishLog(0,'<div class=warning>Login</div>');
+		numdev++;
+	}
+
+	async SendToDevice(buff){
 		// Envia pelo socket
-		this.usocket.write(buff);
+		// this.usocket.write(buff);
 		// Update counters
 		this.bytout+=buff.length;
 		this.msgout++;
 		bytsout+=buff.length;
 		msgsout++;
-		// send log
-		this.SendLog(1,buff);
 	}
 
-	async SendReply(packg,body){
+	async GWMakeReply(packg,body){
 		function si(ii,vv) {buff[ii]=Math.floor(vv / 256); buff[ii+1]=vv % 256;}
 		// Fill parameters
 		let buff = [];
@@ -130,10 +139,12 @@ class Tracker {
 		buff.splice(0,0,0x7e);
 		buff.splice(buff.length,0,0x7e);
 		// Send packge
-		this.SendTracker(buff);
+		this.SendToDevice(buff);
+		// Publish log
+		this.PublishLog(1,buff);
 	}
 
-	async TerminalRegistration(packg, serial) {
+	async GWTerminalRegistration(packg, serial) {
 		function si(ii,vv) {body[ii]=Math.floor(vv / 256); body[ii+1]=vv % 256;}
 
 		// Fill parameters
@@ -141,21 +152,10 @@ class Tracker {
 		si(0,serial);
 		body[2]=0;         //ok
 		for (let x=3; x<19; x++) {body[x]= Math.floor(Math.random() * 90 + 33)}
-		this.SendReply(0x8100, body);
+		this.GWMakeReply(0x8100, body);
 	}
 
-	async InitTracker(did) {
-		// Update ID and login datetime
-		this.did = did;
-		this.login = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
-		// Publish login
-		this.PubTracker('"dte":"'+this.login+'","type":"login"').catch(err => console.error(err));
-		// Send log
-		this.SendLog(0,'<div class=warning>Login</div>');
-		numdev++;
-	}
-
-	async DataParse(packg){
+	async GWParse(packg){
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		function hh(ii) {return packg[ii].toString(16)}
 		// Faz o unescape do 0x7d
@@ -178,13 +178,13 @@ class Tracker {
 			// Testar os subpacotes
 
 			// Verifica se é a primeira mensagem
-			if (this.did==='') { this.InitTracker(hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10)); }
+			if (this.did==='') { this.InitDevice(hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10)); }
 			// Atualiza contadores de msg
 			this.bytin+=packg.length;
 			this.msgin++;
 			msgsin++;
-			// Envia Log
-			this.SendLog(1,packg);
+			// Publish Log
+			this.PublishLog(1,packg);
 			// Processa a informação conforme o tipo de pacote
 			let PkgType = ih(1);	// Packge Type
 			switch (PkgType) {
@@ -201,14 +201,14 @@ class Tracker {
 					break;
 
 				case 0x0100 : // Terminal registration
-					await TerminalRegistration(packg.slice(13,-2), MsgSerial);
+					await GWTerminalRegistration(packg.slice(13,-2), MsgSerial);
 					break;
 
 			}
 		}
 	}
 
-	async IncomingTracker(data){
+	async IncomingDevice(data){
 		bytsin+=data.length;
 		// Processa os dados do buffer
 		while (data.length > 0) {
@@ -222,14 +222,14 @@ class Tracker {
 					let packg=data.slice(0,i+1);
 					data = data.slice(i+1);
 					// Parse data
-					await this.DataParse(packg);
+					await this.GWParse(packg);
 				
 				} else { data = []; bytserr+=data.length; }
 			} else { if (i==-1) {data = []; bytserr+=data.length;} else {data = data.slice(i+1); bytserr+=i; }}
 		} 
 	}
 
-	async CloseTracker() {
+	async CloseDevice() {
 		// Verifica se a conexão foi de um device valido
 		if (this.did!=='') {
 			// Get logout datetime
@@ -242,40 +242,40 @@ class Tracker {
 				}
 			});
 			// Publish logout
-			this.PubTracker('"dte":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err)); 
-			// Send log
-			this.SendLog(0,'<div class=warning>Logout: '+this.err+'</div>');
+			this.PublishDevice('"dte":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err));
+			// Publish log
+			this.PublishLog(0,'<div class=warning>Logout: '+this.err+'</div>');
 			numdev--;
 		}	
 	}
 }
 
-// Initialize new connection
-async function OpenSocket(socket) {
-	const device=new Tracker(socket);
+// Initialize new device connection
+async function OpenDevice(socket) {
+	const device=new Device(socket);
 	
-	socket.on('data',function(data){ device.IncomingTracker(data); });
-	socket.on('close',async function(){ await device.CloseTracker(); delete device; });
+	socket.on('data',function(data){ device.IncomingDevice(data); });
+	socket.on('close',async function(){ await device.CloseDevice(); delete device; });
 	socket.on('end',function(){ device.err='0-Normal End'; device.usocket.destroy(); });
 	socket.on('error',function(){ device.err = '1-Error'; device.usocket.destroy(); });
 	// Close connection when inactive (5 min)
 	socket.setTimeout(300000,function(){ device.err='2-Timeout'; device.usocket.destroy(); });
 }
 
-// Initialize global variables
-var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
-
 // Publish update status
 async function PublishUpdate() {
 	hub.publish('san:server_update','{"name":"'+process.title+'","version":"'+Version+'","ipport":"'+process.env.SrvIP+':'+process.env.SrvPort+'","uptime":"'+Math.floor(OS.uptime()/60)+'"}');
 }
 
+// Initialize global variables
+var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
+
 // Update statistics ever 60s
 setInterval(function(){
-			// Publish update status
-			PublishUpdate();
 			// Get datetime
 			let dte = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
+			// Publish update status
+			PublishUpdate();
 			// Update database
 			db.getConnection(function(err,connection){
 				if (!err) {
@@ -297,7 +297,7 @@ dotenv.config();
 const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, showFriendlyErrorStack: true });
 
-// Atualiza o status do servidor assim que conseguir se connectar
+// Updates server status as soon as it successfully connects
 hub.on('connect', function () { PublishUpdate(); });
 
 // Create and open MySQL connection
@@ -306,7 +306,7 @@ const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_n
 
 // Create and open server connection
 const net = require('net');
-const server = net.createServer(OpenSocket);
+const server = net.createServer(OpenDevice);
 server.listen(process.env.SrvPort, process.env.SrvIP);
 
 // Show parameters and waiting clients
