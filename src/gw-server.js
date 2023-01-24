@@ -40,42 +40,7 @@ class Device {
 		this.sig=0;
 	}
 
-	// Publish log
-	async PublishLog(logtype,log) {
-		function hh(ii) {return log[ii].toString(16)}
-		function ih(ii) {return packg[ii]*256+packg[ii+1]}
-		// Verifica se a chave existe indicando que o cliente ainda esta conectado
-		hub.exists('log:'+this.did, function (err, result) {
-			if (result==0) {
-				if (logtype) {
-					// Cria html para o header
-					let str = '<p><div class=datetime>'+GetDate()+': </div>';
-					str+='<div class=identification>'+hh(0)+'</div><div class=packtype>'+hh(1)+hh(2)+'</div><div class=packlength>'+hh(3)+hh(4)+'</div><div class=terminalnumber>'+hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10)+'</div>';
-					str+='<div class=messageserial>'+hh(11)+hh(12)+'</div>';
-					// Cria html para o body
-					let pkgtype = ih(1);
-					switch (pkgtype) {
-						case 0x0704 : // Upload location data in batches
-							break;
-											
-						case 0x0102 : // Terminal autentication
-							break;
-						
-						case 0x0100 : // Terminal registration
-							break;
-						
-					}
-					str+='<div class=checkdigit>'+hh(log.length-1)+'</div><div class=identification>'+hh(log.length)+'</div></p>';
-					// Publish data
-					hub.publish('log:'+this.did,str);
-				} else {
-					// Publish text
-					hub.publish('log:'+this.did,'<p><div class=datetime>'+GetDate()+': </div>'+log+'</p>');
-				};
-			};
-		});
-	}
-
+	// Publish device data
 	async PublishDevice(str) {
 		// Verifica se a chave existe indicando que o cliente ainda esta conectado
 		hub.exists('did:'+this.did, function (err, result) {
@@ -85,14 +50,25 @@ class Device {
 		});
 	}
 
+	// Publish text in san terminal
+	async PublishTxt(str) {
+		// Verifica se a chave existe indicando que o cliente ainda esta conectado
+		hub.exists('log:'+this.did, function (err, result) {
+			if (result==0) {
+				// Publish text
+				GetDate().then(dte => {	hub.publish('san:monitor_update','<li><div class=datetime>'+dte+' : </div>'+str+'</li>'); });
+			}
+		});
+	}
+
 	async InitDevice(did) {
 		// Update ID and login datetime
 		this.did = did;
 		this.login = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
 		// Publish login
-		this.PublishDevice('"dte":"'+this.login+'","type":"login"').catch(err => console.error(err));
-		// Publish log
-		this.PublishLog(0,'<div class=warning>Login</div>');
+		this.PublishDevice('"datetime":"'+this.login+'","type":"login"').catch(err => console.error(err));
+		// Publish login
+		this.PublishTxt('<div class=warning>Connected</div>');
 		numdev++;
 	}
 
@@ -106,7 +82,109 @@ class Device {
 		msgsout++;
 	}
 
-	async GWMakeReply(packg,body){
+	// Publish log in SAN terminal
+	async GWPublishLog(log) {
+		function ih(ii) {return log[ii]*256+log[ii+1]}
+		function hh(ii) {let h=log[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
+		function ch(ii) {return String.fromCharCode(log[ii]);}
+		function ft(ss) {return '('+ss.substring(1,3)+') '+ss.substring(3,8)+'-'+ss.substring(8,12);}
+		// Verifica se a chave existe indicando que o cliente ainda esta conectado
+		hub.exists('log:'+this.did, async function (err, result) {
+			if (result==0) {
+				// Cria html para o header
+				let bdy = '';
+				let str = await GetDate();
+				str = '<li><div class=datetime>'+str+' : </div>';
+				str+='<div class="identification tooltip">'+hh(0)+'<span class=tooltiptext>Start identification</span></div><div class="packtype tooltip">'+hh(1)+hh(2)+'<span class="tooltiptext">Pack Type: ';
+				// Cria html para o body
+				let pkgtype = ih(1);
+				switch (pkgtype) {
+					case 0x0704 : // Upload location data in batches
+						break;
+										
+					case 0x0102 : // Terminal autentication
+						break;
+					
+					case 0x8001 : // Platform general response
+						str+='Platform general response';
+						break;
+
+					case 0x0003 : // Terminal heartbeat
+						str+='Terminal heartbeat';
+						break;
+					
+					case 0x0100 : // Terminal registration
+						str+='Terminal registration';
+						bdy ='<div class="provincialid tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Provincial ID: '+ih(13)+'</span></div>';
+						bdy+='<div class="citycoutryid tooltip">'+hh(15)+hh(16)+'<span class=tooltiptext>City county ID: '+ih(15)+'</span></div>';
+						bdy+='<div class="manufacturerid tooltip">'+hh(17)+hh(18)+hh(19)+hh(20)+hh(21)+'<span class=tooltiptext>Manufacturer ID: '+ch(17)+ch(18)+ch(19)+ch(20)+ch(21)+'</span></div>';
+
+						bdy+='<div class="terminaltype tooltip">';
+						for (let x=22; x<42; x++) {bdy+=hh(x)}
+						bdy+='<span class=tooltiptext>Terminal type: ';
+						for (let x=22; x<42; x++) {bdy+=ch(x)}
+						bdy+='</span></div>';
+
+						bdy+='<div class="terminalid tooltip">';
+						for (let x=42; x<49; x++) {bdy+=hh(x)}
+						bdy+='<span class=tooltiptext>Terminal ID: ';
+						for (let x=42; x<49; x++) {bdy+=ch(x)}
+						bdy+='</span></div>';
+
+						bdy+='<div class="licenseplatecolor tooltip">'+hh(49)+'<span class=tooltiptext>License plate color</span></div>';
+
+						bdy+='<div class="vehicleid tooltip">';
+						let y=log.length-2;
+						for (let x=50; x<y; x++) {bdy+=hh(x)}
+						bdy+='<span class=tooltiptext>Vehicle ID: ';
+						for (let x=50; x<y; x++) {bdy+=ch(x)}
+						bdy+='</span></div>';
+
+						break;
+
+					case 0x8100 : // Terminal registration reply
+						str+='Terminal registration reply';
+						bdy ='<div class="serialreplay tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
+						bdy+='<div class="result tooltip">'+hh(15)+'<span class=tooltiptext>Result: ';
+						switch (log[15]) {
+							case 0 : 
+								bdy+='0: Successful</span></div>';
+								break;
+
+							case 1 :
+								bdy+='1: the vehicle has been registered</span></div>';
+								break;
+
+							case 2 :
+								bdy+='2: the vehicle is not in the database</span></div>';
+								break;
+
+							case 3 :
+								bdy+='3: the terminal has been registered</span></div>';
+								break;
+
+							case 4 :
+								bdy+='4: the terminal is not in the database</span></div>';
+								break;
+
+							default:
+								bdy+='Error invalid value</span></div>';
+								break;
+						}
+						break;
+					}
+
+				let tn = hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10);
+				str+='</span></div><div class="packlength tooltip">'+hh(3)+hh(4)+'<span class=tooltiptext>Body length: '+(ih(3) & 0x01ff)+'</span></div><div class="terminalnumber tooltip">'+tn+'<span class=tooltiptext>Terminal number :'+ft(tn)+'</span></div>';
+				str+='<div class="messageserial tooltip">'+hh(11)+hh(12)+'<span class=tooltiptext>Serial msg: '+ih(11)+'</span></div>';
+				str+=bdy+'<div class="checkdigit tooltip">'+hh(log.length-2)+'<span class=tooltiptext>Check digit</span></div><div class="identification tooltip">'+hh(log.length-1)+'<span class=tooltiptext>End identification</span></div></li>';
+				// Publish data
+				hub.publish('san:monitor_update',str);
+			}
+		});
+	}
+
+	async GWMakeReply(packg,body) {
 		function si(ii,vv) {buff[ii]=Math.floor(vv / 256); buff[ii+1]=vv % 256;}
 		// Fill parameters
 		let buff = [];
@@ -135,13 +213,13 @@ class Device {
 			// Next
 			y=buff.indexOf(0x7e,y+2);
 		}
-		// Adciona indentificadores
+		// Adciona indentificadores de inicio e fim
 		buff.splice(0,0,0x7e);
 		buff.splice(buff.length,0,0x7e);
 		// Send packge
 		this.SendToDevice(buff);
 		// Publish log
-		this.PublishLog(1,buff);
+		this.GWPublishLog(buff);
 	}
 
 	async GWTerminalRegistration(packg, serial) {
@@ -155,9 +233,9 @@ class Device {
 		this.GWMakeReply(0x8100, body);
 	}
 
-	async GWParse(packg){
+	async GWParse(packg) {
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
-		function hh(ii) {return packg[ii].toString(16)}
+		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
@@ -172,7 +250,6 @@ class Device {
 		// Verifica o check digit
 		if ( checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
-			let BodyLen = ih(3) & 0x1ff; // Body length
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			let MsgSerial = ih(11); // Message serial number
 			// Testar os subpacotes
@@ -184,7 +261,7 @@ class Device {
 			this.msgin++;
 			msgsin++;
 			// Publish Log
-			this.PublishLog(1,packg);
+			this.GWPublishLog(packg);
 			// Processa a informação conforme o tipo de pacote
 			let PkgType = ih(1);	// Packge Type
 			switch (PkgType) {
@@ -201,7 +278,7 @@ class Device {
 					break;
 
 				case 0x0100 : // Terminal registration
-					await GWTerminalRegistration(packg.slice(13,-2), MsgSerial);
+					await this.GWTerminalRegistration(packg.slice(13,-2), MsgSerial);
 					break;
 
 			}
@@ -223,7 +300,6 @@ class Device {
 					data = data.slice(i+1);
 					// Parse data
 					await this.GWParse(packg);
-				
 				} else { data = []; bytserr+=data.length; }
 			} else { if (i==-1) {data = []; bytserr+=data.length;} else {data = data.slice(i+1); bytserr+=i; }}
 		} 
@@ -242,9 +318,9 @@ class Device {
 				}
 			});
 			// Publish logout
-			this.PublishDevice('"dte":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err));
+			this.PublishDevice('"datetime":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err));
 			// Publish log
-			this.PublishLog(0,'<div class=warning>Logout: '+this.err+'</div>');
+			this.PublishTxt('<div class=warning>Disconnected: '+this.err+'</div>');
 			numdev--;
 		}	
 	}
@@ -256,7 +332,7 @@ async function OpenDevice(socket) {
 	
 	socket.on('data',function(data){ device.IncomingDevice(data); });
 	socket.on('close',async function(){ await device.CloseDevice(); delete device; });
-	socket.on('end',function(){ device.err='0-Normal End'; device.usocket.destroy(); });
+	socket.on('end',function(){ device.err='0-Normal end'; device.usocket.destroy(); });
 	socket.on('error',function(){ device.err = '1-Error'; device.usocket.destroy(); });
 	// Close connection when inactive (5 min)
 	socket.setTimeout(300000,function(){ device.err='2-Timeout'; device.usocket.destroy(); });
@@ -271,7 +347,7 @@ async function PublishUpdate() {
 var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
 // Update statistics ever 60s
-setInterval(function(){
+setInterval(function() {
 			// Get datetime
 			let dte = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
 			// Publish update status
