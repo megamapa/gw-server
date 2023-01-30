@@ -50,9 +50,9 @@ class Device {
 		});
 	}
 
-	// Publish text in san terminal
+	// Publish text in SAN terminal
 	async PublishTxt(str) {
-		// Verifica se a chave existe indicando que o cliente ainda esta conectado
+		// Verifica se a chave existe indicando que o cliente ainda está conectado
 		hub.exists('log:'+this.did, function (err, result) {
 			if (result==0) {
 				// Publish text
@@ -74,7 +74,7 @@ class Device {
 
 	async SendToDevice(buff){
 		// Envia pelo socket
-		// this.usocket.write(buff);
+		this.usocket.write(buff);
 		// Update counters
 		this.bytout+=buff.length;
 		this.msgout++;
@@ -85,6 +85,7 @@ class Device {
 	// Publish log in SAN terminal
 	async GWPublishLog(log) {
 		function ih(ii) {return log[ii]*256+log[ii+1]}
+		function lh(ii) {return (log[ii]*256+log[ii+1])*65536+(log[ii+2]*256+log[ii+3])}
 		function hh(ii) {let h=log[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 		function ch(ii) {return String.fromCharCode(log[ii]);}
 		function ft(ss) {return '('+ss.substring(1,3)+') '+ss.substring(3,8)+'-'+ss.substring(8,12);}
@@ -97,20 +98,138 @@ class Device {
 				str = '<li><div class=datetime>'+str+' : </div>';
 				str+='<div class="identification tooltip">'+hh(0)+'<span class=tooltiptext>Start identification</span></div><div class="packtype tooltip">'+hh(1)+hh(2)+'<span class="tooltiptext">Pack Type: ';
 				// Cria html para o body
-				let pkgtype = ih(1);
+				let b=log.length-2; // Tamanho do body
+				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
-					case 0x0704 : // Upload location data in batches
+					case 0x0200 : // Location information report
+						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;}
+						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;}
+						str+='Location information report';
+						bdy ='<div class="alarmsign tooltip">'+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
+						bdy+='<div class="status tooltip">'+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
+						bdy+='<div class="latitude tooltip">'+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
+						bdy+='<div class="longitude tooltip">'+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
+						bdy+='<div class="elevation tooltip">'+hh(29)+hh(30)+'<span class=tooltiptext>Elevation: '+ih(29)+'m</span></div>';
+						bdy+='<div class="speed tooltip">'+hh(31)+hh(32)+'<span class=tooltiptext>Speed: '+ih(31)+'km/h</span></div>';
+						bdy+='<div class="direction tooltip">'+hh(33)+hh(34)+'<span class=tooltiptext>Direction: '+ih(33)+'o</span></div>';
+						bdy+='<div class="localtime tooltip">'+hh(35)+hh(36)+hh(37)+hh(38)+hh(39)+hh(40)+'<span class=tooltiptext>Local time: '+hh(35)+'-'+hh(36)+'-'+hh(37)+' '+hh(38)+':'+hh(39)+':'+hh(40)+'</span></div>';
+
+						let y = 41;
+						while (y<b) {
+							switch (log[y]) {
+								case 0x01 : 
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Mileage: '+lh(y+2)+'</span></div>';
+									break;
+								case 0x02 : 
+									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Oil quantity: '+ih(y+2)+'</span></div>';
+									break;
+								case 0x03 : 
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Drive record: '+ih(y+2)+'</span></div>';
+									break;
+								case 0x14 : 
+									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video alarm: '+lh(y+2)+'</span></div>';
+									break;
+								case 0x15 : 
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign loss alarm status: '+lh(y+2)+'</span></div>';
+									break;
+								case 0x16 : 
+									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign blocking alarm status: '+lh(y+2)+'</span></div>';
+									break;
+								case 0x17 : 
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Memory failure alarm status: '+ih(y+2)+'</span></div>';
+									break;
+								case 0x18 : 
+									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Abnormal driving behavior alarm: '+ih(y+2)+'</span></div>';
+									break;
+								case 0x2b : 
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Power line voltage/capacity: '+ih(y+2)+'V '+ih(y+4)+'%</span></div>';
+									break;
+								case 0x30 :
+									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Wireless signal intensity: '+log[y+2]+'</span></div>';
+									break;
+								case 0x31 :
+									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Number of satellites: '+log[y+2]+'</span></div>';
+									break;
+								default:
+									bdy+='<div class="warning tooltip">'+hh(y)+hh(y+1);
+									for (let x=y;x<y+log[y+1];x++) {bdy+=hh(x)}
+									bdy+='<span class=tooltiptext>Unknow</span></div>';
+							}
+							y+=log[y+1]+2;
+						}
+						
 						break;
 										
-					case 0x0102 : // Terminal autentication
+					case 0x0704 : // Upload location data in batches
+						str+='Upload location data';
+						bdy ='<div class="numberofitens tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Number of itens: '+ih(13)+'</span></div>';
+						bdy+='<div class="result tooltip">'+hh(15)+'<span class=tooltiptext>Location type: ';
+						switch (log[15]) {
+							case 0 : 
+								bdy+='0: Normal position batch report</span></div>';
+								break;
+							case 1 : 
+								bdy+='1: Blind area supplement report</span></div>';
+								break;
+						}
+
+						bdy+='<div class="authcode tooltip">';
+						for (let x=16; x<b; x++) {bdy+=hh(x)}
+						bdy+='<span class=tooltiptext>Authentication code: </span></div>';
+
+
+					/*	let y = 16;     // Inicio do buffer
+						let c = ih(13); // Quantidade de blocos a serem processados
+						while (c > 0) {
+							let x =ih(y); // Tamando do bloco
+
+
+							bdy+=hh(y)
+
+
+							c--;
+						}*/
+
+
 						break;
-					
+										
 					case 0x8001 : // Platform general response
 						str+='Platform general response';
+						bdy ='<div class="serialreplay tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
+						bdy+='<div class="terminalmsg tooltip">'+hh(15)+hh(16)+'<span class=tooltiptext>Response message: '+ih(15)+'</span></div>';
+						bdy+='<div class="result tooltip">'+hh(17)+'<span class=tooltiptext>Result: ';
+						switch (log[17]) {
+							case 0 : 
+								bdy+='0: Successful</span></div>';
+								break;
+							case 1 : 
+								bdy+='1: Failure</span></div>';
+								break;
+							case 2 : 
+								bdy+='2: The message is incorrect</span></div>';
+								break;
+							case 3 : 
+								bdy+='3: Not suported</span></div>';
+								break;
+							case 4 : 
+								bdy+='4: Call the police</span></div>';
+								break;
+							default:
+								bdy+='Error invalid value</span></div>';
+						}
 						break;
 
-					case 0x0003 : // Terminal heartbeat
+					case 0x0002 : // Terminal heartbeat
 						str+='Terminal heartbeat';
+						break;
+					
+					case 0x0102 : // Terminal autentication
+						str+='Terminal autentication';
+						bdy ='<div class="authcode tooltip">';
+						for (let x=13; x<b; x++) {bdy+=hh(x)}
+						bdy+='<span class=tooltiptext>Authentication code: ';
+						for (let x=13; x<b; x++) {bdy+=ch(x)}
+						bdy+='</span></div>';
 						break;
 					
 					case 0x0100 : // Terminal registration
@@ -134,10 +253,9 @@ class Device {
 						bdy+='<div class="licenseplatecolor tooltip">'+hh(49)+'<span class=tooltiptext>License plate color</span></div>';
 
 						bdy+='<div class="vehicleid tooltip">';
-						let y=log.length-2;
-						for (let x=50; x<y; x++) {bdy+=hh(x)}
+						for (let x=50; x<b; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Vehicle ID: ';
-						for (let x=50; x<y; x++) {bdy+=ch(x)}
+						for (let x=50; x<b; x++) {bdy+=ch(x)}
 						bdy+='</span></div>';
 
 						break;
@@ -149,6 +267,13 @@ class Device {
 						switch (log[15]) {
 							case 0 : 
 								bdy+='0: Successful</span></div>';
+
+								bdy+='<div class="authcode tooltip">';
+								for (let x=16; x<b; x++) {bdy+=hh(x)}
+								bdy+='<span class=tooltiptext>Authentication code: ';
+								for (let x=16; x<b; x++) {bdy+=ch(x)}
+								bdy+='</span></div>';
+
 								break;
 
 							case 1 :
@@ -171,6 +296,10 @@ class Device {
 								bdy+='Error invalid value</span></div>';
 								break;
 						}
+						break;
+
+					case 0x0003 : // Terminal desconnection
+						str+='Terminal desconnection';
 						break;
 					}
 
@@ -200,7 +329,7 @@ class Device {
 		// Adiciona check digit no final do buffer
 		buff.splice(buff.length,0,checkdigit);
 		// Faz o escape do 0x7d
-		let y=buff.indexOf(0x7d,0);
+		let y=buff.indexOf(0x7d);
 		while (y!=-1) {
 			buff.splice(y+1,0,0x01);
 			// Next
@@ -217,19 +346,49 @@ class Device {
 		buff.splice(0,0,0x7e);
 		buff.splice(buff.length,0,0x7e);
 		// Send packge
-		this.SendToDevice(buff);
+		this.SendToDevice(new Uint8Array(buff));
 		// Publish log
 		this.GWPublishLog(buff);
 	}
 
-	async GWTerminalRegistration(packg, serial) {
-		function si(ii,vv) {body[ii]=Math.floor(vv / 256); body[ii+1]=vv % 256;}
+	async GWUploadLocation(packg) {
 
 		// Fill parameters
-		let body = [];
-		si(0,serial);
-		body[2]=0;         //ok
-		for (let x=3; x<19; x++) {body[x]= Math.floor(Math.random() * 90 + 33)}
+		let body = [packg[11],packg[12]]; // Serial number
+		body[2]=2; body[3]=0;   // 0x0200
+		body[4]=0;              // ok
+		this.GWMakeReply(0x8001, body);
+	}
+
+	async GWLocationInformation(packg) {
+		// Fill parameters
+		let body = [packg[11],packg[12]]; // Serial number
+		body[2]=2; body[3]=0;   // 0x0200
+		body[4]=0;              // ok
+		this.GWMakeReply(0x8001, body);
+	}
+
+	async GWHeartbeat(packg) {
+		// Fill parameters
+		let body = [packg[11],packg[12]]; // Serial number
+		body[2]=0; body[3]=2;  // 0x0002
+		body[4]=0;             // ok
+		this.GWMakeReply(0x8001, body);
+	}
+
+	async GWTerminalAutentication(packg) {
+		// Fill parameters
+		let body = [packg[11],packg[12]]; // Serial number
+		body[2]=1; body[3]=2;  // 0x0102 
+		body[4]=0;             // ok
+		this.GWMakeReply(0x8001, body);
+	}
+
+	async GWTerminalRegistration(packg) {
+		// Fill parameters
+		let body = [packg[11],packg[12]]; // Serial Number
+		body[2]=0;         				  //ok
+		for (let x=3; x<19; x++) {body[x]= Math.floor(Math.random() * 90 + 48)} // Autentication code
 		this.GWMakeReply(0x8100, body);
 	}
 
@@ -239,7 +398,8 @@ class Device {
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
-			if (packg[y+1]==0x02) {packg[y]=0x7e}
+			console.log(packg);
+			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
 			// Next
 			y=packg.indexOf(0x7d,y+1);
@@ -248,10 +408,9 @@ class Device {
 		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
-		if ( checkdigit == packg[packg.length-2]) {
+		if (checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
-			let MsgSerial = ih(11); // Message serial number
 			// Testar os subpacotes
 
 			// Verifica se é a primeira mensagem
@@ -266,19 +425,23 @@ class Device {
 			let PkgType = ih(1);	// Packge Type
 			switch (PkgType) {
 				case 0x0002 : // Terminal heart beat
+					this.GWHeartbeat(packg);
 					break;
 
 				case 0x0200 : // Location information reporting
+					this.GWLocationInformation(packg);
 					break;
 
 				case 0x0704 : // Upload location data in batches
+					this.GWUploadLocation(packg);
 					break;
 
 				case 0x0102 : // Terminal autentication
+					this.GWTerminalAutentication(packg);
 					break;
 
 				case 0x0100 : // Terminal registration
-					await this.GWTerminalRegistration(packg.slice(13,-2), MsgSerial);
+					this.GWTerminalRegistration(packg);
 					break;
 
 			}
@@ -299,7 +462,7 @@ class Device {
 					let packg=data.slice(0,i+1);
 					data = data.slice(i+1);
 					// Parse data
-					await this.GWParse(packg);
+					await this.GWParse(new Uint8Array(packg));
 				} else { data = []; bytserr+=data.length; }
 			} else { if (i==-1) {data = []; bytserr+=data.length;} else {data = data.slice(i+1); bytserr+=i; }}
 		} 
