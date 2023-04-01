@@ -1,14 +1,4 @@
 <h1 align="center">GW-SERVER for node.js</h1>
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
-;e \ penis
 <h5 align="center">Sponsors</h5>
 
 <div align="center">
