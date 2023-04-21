@@ -45,7 +45,7 @@ class Device {
 		// Verifica se a chave existe indicando que o cliente ainda esta conectado
 		hub.exists('did:'+this.did, function (err, result) {
 			if (result) {
-				hub.publish('did:'+this.did,'{"did":"'+this.did+'",'+str+'}');
+				pub.publish('did:'+this.did,'{"did":"'+this.did+'",'+str+'}');
 			};
 		});
 	}
@@ -56,7 +56,7 @@ class Device {
 		hub.exists('log:'+this.did, function (err, result) {
 			if (result==0) {
 				// Publish text
-				GetDate().then(dte => {	hub.publish('san:monitor_update','<li><div class=datetime>'+dte+' : </div>'+str+'</li>'); });
+				GetDate().then(dte => {	pub.publish('san:monitor_update','<li><div class=datetime>'+dte+' : </div>'+str+'</li>'); });
 			}
 		});
 	}
@@ -308,7 +308,7 @@ class Device {
 				str+='<div class="messageserial tooltip">'+hh(11)+hh(12)+'<span class=tooltiptext>Serial msg: '+ih(11)+'</span></div>';
 				str+=bdy+'<div class="checkdigit tooltip">'+hh(log.length-2)+'<span class=tooltiptext>Check digit</span></div><div class="identification tooltip">'+hh(log.length-1)+'<span class=tooltiptext>End identification</span></div></li>';
 				// Publish data
-				hub.publish('san:monitor_update',str);
+				pub.publish('san:monitor_update',str);
 			}
 		});
 	}
@@ -503,11 +503,36 @@ async function OpenDevice(socket) {
 
 // Publish update status
 async function PublishUpdate() {
-	hub.publish('san:server_update','{"name":"'+process.title+'","version":"'+Version+'","ipport":"'+process.env.SrvIP+':'+process.env.SrvPort+'","uptime":"'+Math.floor(OS.uptime()/60)+'"}');
+	GetDate().then(dte => {
+		let uptime = Date.parse(dte) - starttime;
+		pub.publish('san:server_update','{"name":"'+process.title+'","version":"'+Version+'","ipport":"'+process.env.SrvIP+':'+process.env.SrvPort+'","uptime":"'+Math.floor(uptime/60000)+'"}');
+	});
 }
 
+/****************************************************************************************************/
+/* Read enviroment variables																		*/
+/****************************************************************************************************/
+const dotenv = require('dotenv');
+dotenv.config();
+
+/****************************************************************************************************/
+/* Create and open Redis connection																	*/
+/****************************************************************************************************/
+const Redis = require('ioredis');
+const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
+const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
+
+// Updates server status as soon as it successfully connects
+hub.on('connect', function () { GetDate().then(dte => {console.log('\033[30m'+dte+': \033[32mHUB connected.\033[0;0m');}); });
+
+/****************************************************************************************************/
+/* Create and open MySQL connection																	*/
+/****************************************************************************************************/
+const mysql = require('mysql');
+const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
+
 // Initialize global variables
-var numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
+var starttime=0,numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
 // Update statistics ever 60s
 setInterval(function() {
@@ -528,32 +553,29 @@ setInterval(function() {
 			});
 },60000);
 
-// Read enviroment variables
-const dotenv = require('dotenv');
-dotenv.config();
-
-// Create and open Redis connection
-const Redis = require('ioredis');
-const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, showFriendlyErrorStack: true });
-
-// Updates server status as soon as it successfully connects
-hub.on('connect', function () { PublishUpdate(); });
-
-// Create and open MySQL connection
-const mysql = require('mysql');
-const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
-
-// Create and open server connection
+/****************************************************************************************************/
+/* Create and open server connection																*/
+/****************************************************************************************************/
 const net = require('net');
 const server = net.createServer(OpenDevice);
 server.listen(process.env.SrvPort, process.env.SrvIP);
 
-// Show parameters and waiting clients
+// Updates server status as soon as it successfully connects
+server.on('listening', function () { PublishUpdate(); GetDate().then(dte => { 	
+	console.log('\033[30m'+dte+': \033[32mServer ready.\033[0;0m');
+	console.log('\033[30m'+dte+': \033[32mWaiting clients...\033[0;0m'); }); 
+});
+
+/****************************************************************************************************/
+/* 	Show parameters and waiting clients																*/
+/****************************************************************************************************/
 const OS = require('os');
 GetDate().then(dte => {
-	console.log('\033[1;30m'+dte+': \033[0;31m================================');
-	console.log('\033[1;30m'+dte+': \033[0;31m' + 'APP : ' + process.title + ' ('+Version+')');
-	console.log('\033[1;30m'+dte+': \033[0;31m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
-	console.log('\033[1;30m'+dte+': \033[0;31m' + 'CPUs: '+ OS.cpus().length);
-	console.log('\033[1;30m'+dte+': \033[0;31m================================');
-	console.log('\033[1;30m'+dte+': \033[0;31mWaiting clients...\033[0;0m');});
+	// Save start datetime
+	starttime = Date.parse(dte);
+	// Show parameters and waiting clients
+	console.log('\033[30m'+dte+': \033[37m================================');
+	console.log('\033[30m'+dte+': \033[37m' + 'APP : ' + process.title + ' ('+Version+')');
+	console.log('\033[30m'+dte+': \033[37m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
+	console.log('\033[30m'+dte+': \033[37m' + 'CPUs: '+ OS.cpus().length);
+	console.log('\033[30m'+dte+': \033[37m================================\033[0;0m');});
