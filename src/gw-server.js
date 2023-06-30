@@ -573,10 +573,9 @@ const OS = require('os');
 GetDate().then(dte => {
 	// Save start datetime
 	starttime = Date.parse(dte);
-	console.log(dte+'testdsgfgfsgffffffffffffffffffffffffffffffffffffffffffffffgfe');
 	// Show parameters and waiting clients
 	console.log('\033[33m'+dte+' \033[37m================================');
-	console.log('\033[30m'+dte+' \033[37m' + 'APP : ' + process.title + ' ('+Version+')');
-	console.log('\033[30m'+dte+' \033[37m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
-	console.log('\033[30m'+dte+' \033[37m' + 'CPUs: '+ OS.cpus().length);
-	console.log('\033[30m'+dte+' \033[37m================================\033[0;0m');});
+	console.log('\033[34m'+dte+' \033[37m' + 'APP : ' + process.title + ' ('+Version+')');
+	console.log('\033[35m'+dte+' \033[37m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
+	console.log('\033[36m'+dte+' \033[37m' + 'CPUs: '+ OS.cpus().length);
+	console.log('\033[37m'+dte+' \033[37m================================\033[0;0m');});
