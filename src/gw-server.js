@@ -573,7 +573,7 @@ const OS = require('os');
 GetDate().then(dte => {
 	// Save start datetime
 	starttime = Date.parse(dte);
-	console.log(dte+'teste');
+	console.log('testdsgfgfsgfffffffffffffffffffffffffffffffffffffffffffffffe');
 	// Show parameters and waiting clients
 	console.log('\033[30m'+dte+': \033[37m================================');
 	console.log('\033[30m'+dte+': \033[37m' + 'APP : ' + process.title + ' ('+Version+')');
