@@ -523,7 +523,9 @@ const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, passw
 const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 
 // Updates server status as soon as it successfully connects
-hub.on('connect', function () { GetDate().then(dte => {console.log('\033[36m'+dte+' \033[32mHUB connected.\033[0;0m');}); });
+hub.on('connect', function () { GetDate().then(dte => { console.log('\033[36m'+dte+' \033[32mHUB connected.\033[0;0m');
+														console.log('\033[36m'+dte+' \033[32mWaiting clients...\033[0;0m'); });
+});
 
 /****************************************************************************************************/
 /* Create and open MySQL connection																	*/
@@ -563,7 +565,7 @@ server.listen(process.env.SrvPort, process.env.SrvIP);
 // Updates server status as soon as it successfully connects
 server.on('listening', function () { PublishUpdate(); GetDate().then(dte => { 	
 	console.log('\033[36m'+dte+' \033[32mServer ready.\033[0;0m');
-	console.log('\033[36m'+dte+' \033[32mWaiting clients...\033[0;0m'); }); 
+	}); 
 });
 
 /****************************************************************************************************/
