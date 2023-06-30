@@ -575,7 +575,7 @@ GetDate().then(dte => {
 	starttime = Date.parse(dte);
 	console.log(dte+'testdsgfgfsgffffffffffffffffffffffffffffffffffffffffffffffgfe');
 	// Show parameters and waiting clients
-	console.log('\033[30m'+dte+': \033[37m================================');
+	console.log('\033[31m'+dte+': \033[37m================================');
 	console.log('\033[30m'+dte+': \033[37m' + 'APP : ' + process.title + ' ('+Version+')');
 	console.log('\033[30m'+dte+': \033[37m' + 'IP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
 	console.log('\033[30m'+dte+': \033[37m' + 'CPUs: '+ OS.cpus().length);
