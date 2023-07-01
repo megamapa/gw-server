@@ -1,0 +1,2 @@
+Para mudar IP e Porta
+<SPBSJ*P:BSJGPS*D:999.999.999.999,000>
