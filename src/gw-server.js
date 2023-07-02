@@ -352,7 +352,6 @@ class Device {
 	}
 
 	async GWUploadLocation(packg) {
-
 		// Fill parameters
 		let body = [packg[11],packg[12]]; // Serial number
 		body[2]=2; body[3]=0;   // 0x0200
@@ -449,7 +448,6 @@ class Device {
 	}
 
 	async IncomingDevice(data){
-		console.log('foi');
 		bytsin+=data.length;
 		// Processa os dados do buffer
 		while (data.length > 0) {
