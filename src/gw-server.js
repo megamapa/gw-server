@@ -102,8 +102,8 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
-						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;}
-						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;}
+						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
+						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
 						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
 						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
