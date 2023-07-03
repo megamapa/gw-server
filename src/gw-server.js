@@ -408,7 +408,7 @@ class Device {
 		// Verifica o check digit
 		console.log(packg);
 		console.log(checkdigit);
-		if (checkdigit == packg[packg.length-1]) {
+		if (checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			// Testar os subpacotes
