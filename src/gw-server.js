@@ -95,8 +95,8 @@ class Device {
 				// Cria html para o header
 				let bdy = '';
 				let str = await GetDate();
-				str = '<li><div class=datetime>'+str+' : </div>';
-				str+='<div class="identification tooltip">'+hh(0)+'<span class=tooltiptext>Start identification</span></div><div class="packtype tooltip">'+hh(1)+hh(2)+'<span class="tooltiptext">Pack Type: ';
+				str = "<li><div class=datetime>"+str+" : </div>";
+				str+= "<div class='identification tooltip'>"+hh(0)+"<span class=tooltiptext>Start identification</span></div><div class='packtype tooltip'>"+hh(1)+hh(2)+"<span class=tooltiptext>Pack Type: ";
 				// Cria html para o body
 				let b=log.length-2; // Tamanho do body
 				let pkgtype = ih(1); // Tipo do pacote
@@ -225,7 +225,7 @@ class Device {
 					
 					case 0x0102 : // Terminal autentication
 						str+='Terminal autentication';
-						bdy ='<div class="authcode tooltip">';
+						bdy ="<div class='authcode tooltip'>";
 						for (let x=13; x<b; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Authentication code: ';
 						for (let x=13; x<b; x++) {bdy+=ch(x)}
@@ -304,9 +304,9 @@ class Device {
 					}
 
 				let tn = hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10);
-				str+='</span></div><div class="packlength tooltip">'+hh(3)+hh(4)+'<span class=tooltiptext>Body length: '+(ih(3) & 0x01ff)+'</span></div><div class="terminalnumber tooltip">'+tn+'<span class=tooltiptext>Terminal number :'+ft(tn)+'</span></div>';
-				str+='<div class="messageserial tooltip">'+hh(11)+hh(12)+'<span class=tooltiptext>Serial msg: '+ih(11)+'</span></div>';
-				str+=bdy+'<div class="checkdigit tooltip">'+hh(log.length-2)+'<span class=tooltiptext>Check digit</span></div><div class="identification tooltip">'+hh(log.length-1)+'<span class=tooltiptext>End identification</span></div></li>';
+				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x01ff)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :"+ft(tn)+"</span></div>";
+				str+="<div class='messageserial tooltip'>"+hh(11)+hh(12)+"<span class=tooltiptext>Serial msg: "+ih(11)+"</span></div>";
+				str+=bdy+"<div class='checkdigit tooltip'>"+hh(log.length-2)+"<span class=tooltiptext>Check digit</span></div><div class='identification tooltip'>"+hh(log.length-1)+"<span class=tooltiptext>End identification</span></div></li>";
 				// Publish data
 				pub.publish('san:monitor_update','{"msg":"'+str+'"}');
 			}
