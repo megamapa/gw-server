@@ -106,13 +106,13 @@ class Device {
 						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;}
 						str+='Location information report';
 						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
-						bdy+='<div class="status tooltip">'+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
-						bdy+='<div class="latitude tooltip">'+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
-						bdy+='<div class="longitude tooltip">'+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
-						bdy+='<div class="elevation tooltip">'+hh(29)+hh(30)+'<span class=tooltiptext>Elevation: '+ih(29)+'m</span></div>';
-						bdy+='<div class="speed tooltip">'+hh(31)+hh(32)+'<span class=tooltiptext>Speed: '+ih(31)+'km/h</span></div>';
-						bdy+='<div class="direction tooltip">'+hh(33)+hh(34)+'<span class=tooltiptext>Direction: '+ih(33)+'o</span></div>';
-						bdy+='<div class="localtime tooltip">'+hh(35)+hh(36)+hh(37)+hh(38)+hh(39)+hh(40)+'<span class=tooltiptext>Local time: '+hh(35)+'-'+hh(36)+'-'+hh(37)+' '+hh(38)+':'+hh(39)+':'+hh(40)+'</span></div>';
+						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
+						bdy+="<div class='latitude tooltip'>"+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
+						bdy+="<div class='longitude tooltip'>"+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
+						bdy+="<div class='elevation tooltip'>"+hh(29)+hh(30)+'<span class=tooltiptext>Elevation: '+ih(29)+'m</span></div>';
+						bdy+="<div class='speed tooltip'>"+hh(31)+hh(32)+'<span class=tooltiptext>Speed: '+ih(31)+'km/h</span></div>';
+						bdy+="<div class='direction tooltip'>"+hh(33)+hh(34)+'<span class=tooltiptext>Direction: '+ih(33)+'o</span></div>';
+						bdy+="<div class='localtime tooltip'>"+hh(35)+hh(36)+hh(37)+hh(38)+hh(39)+hh(40)+'<span class=tooltiptext>Local time: '+hh(35)+'-'+hh(36)+'-'+hh(37)+' '+hh(38)+':'+hh(39)+':'+hh(40)+'</span></div>';
 
 						let y = 41;
 						while (y<b) {
