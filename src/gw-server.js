@@ -56,7 +56,7 @@ class Device {
 		hub.exists('log:'+this.did, function (err, result) {
 			if (result==0) {
 				// Publish text
-				GetDate().then(dte => {	pub.publish('san:monitor_update','<li><div class=datetime>'+dte+' : </div>'+str+'</li>'); });
+				GetDate().then(dte => {	pub.publish('san:monitor_update','{"msg":"<li><div class=datetime>'+dte+' : </div>'+str+'</li>"}'); });
 			}
 		});
 	}
@@ -406,8 +406,6 @@ class Device {
 		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
-		console.log(packg);
-		console.log(checkdigit);
 		if (checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
