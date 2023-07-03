@@ -447,25 +447,17 @@ class Device {
 		}
 	}
 
-	async IncomingDevice(data){
+	async IncomingDevice(data) {
 		bytsin+=data.length;
 		// Processa os dados do buffer
-		while (data.length > 0) {
+		if (data.length > 14) {
 			// Verifica se a linha comeca com 0x7e
-			let i=data.indexOf(0x7e,0);
-			if (i==0) { 
-				// Procura o final da linha
-				i=data.indexOf(0x7e,1);
-				if (i>0) {
-					// Extrai linha do data
-					let packg=data.slice(0,i+1);
-					data = data.slice(i+1);
-					// Parse data
-					await this.GWParse(packg); //new Uint8Array(packg)
-				} else { data = []; bytserr+=data.length; }
-			} else { if (i==-1) {data = []; bytserr+=data.length;} else {data = data.slice(i+1); bytserr+=i; }}
-		} 
-	}
+			if (data[0]==0x7e) {
+				// Decodifica a linha
+				await this.GWParse(data.slice(1,data.length));
+			} else {bytserr+=data.length;}
+		} else {bytserr+=data.length;}
+	} 
 
 	async CloseDevice() {
 		// Verifica se a conexão foi de um device valido
