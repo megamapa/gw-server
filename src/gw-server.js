@@ -397,7 +397,6 @@ class Device {
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
-			console.log(packg);
 			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
 			// Next
@@ -407,6 +406,8 @@ class Device {
 		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
+		console.log(packg);
+		console.log(checkdigit);
 		if (checkdigit == packg[packg.length-1]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
