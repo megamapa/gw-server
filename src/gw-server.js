@@ -397,7 +397,7 @@ class Device {
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
-			console.log(packg);
+			//console.log(packg);
 			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
 			// Next
@@ -461,7 +461,7 @@ class Device {
 					let packg=data.slice(0,i+1);
 					data = data.slice(i+1);
 					// Parse data
-					await this.GWParse(new Uint8Array(packg));
+					await this.GWParse(packg); //new Uint8Array(packg)
 				} else { data = []; bytserr+=data.length; }
 			} else { if (i==-1) {data = []; bytserr+=data.length;} else {data = data.slice(i+1); bytserr+=i; }}
 		} 
