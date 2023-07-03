@@ -56,7 +56,7 @@ class Device {
 		hub.exists('log:'+this.did, function (err, result) {
 			if (result==0) {
 				// Publish text
-				GetDate().then(dte => {	pub.publish('san:monitor_update','{"msg":"<li><div class=datetime>'+dte+' : </div>'+str+'</li>"}'); });
+				GetDate().then(dte => {	pub.publish('san:monitor_update','<li><div class=datetime>'+dte+' : </div>'+str+'</li>'); });
 			}
 		});
 	}
