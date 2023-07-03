@@ -404,7 +404,7 @@ class Device {
 			y=packg.indexOf(0x7d,y+1);
 		}
 		// Calcula o check digit
-		let checkdigit = packg[0];
+		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
 		if (checkdigit == packg[packg.length-1]) {
@@ -453,9 +453,8 @@ class Device {
 		if (data.length > 14) {
 			// Verifica se a linha comeca com 0x7e
 			if (data[0]==0x7e) {
-				let packg = Array.from(data.slice(1,data.length-1))
 				// Decodifica a linha
-				await this.GWParse(packg);
+				await this.GWParse(Array.from(data));
 			} else {bytserr+=data.length;}
 		} else {bytserr+=data.length;}
 	} 
