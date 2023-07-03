@@ -453,8 +453,9 @@ class Device {
 		if (data.length > 14) {
 			// Verifica se a linha comeca com 0x7e
 			if (data[0]==0x7e) {
+				let packg = new Uint8Array(data.slice(1,data.length-1))
 				// Decodifica a linha
-				await this.GWParse(data.slice(1,data.length));
+				await this.GWParse(packg);
 			} else {bytserr+=data.length;}
 		} else {bytserr+=data.length;}
 	} 
