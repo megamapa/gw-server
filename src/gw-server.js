@@ -308,7 +308,7 @@ class Device {
 				str+='<div class="messageserial tooltip">'+hh(11)+hh(12)+'<span class=tooltiptext>Serial msg: '+ih(11)+'</span></div>';
 				str+=bdy+'<div class="checkdigit tooltip">'+hh(log.length-2)+'<span class=tooltiptext>Check digit</span></div><div class="identification tooltip">'+hh(log.length-1)+'<span class=tooltiptext>End identification</span></div></li>';
 				// Publish data
-				pub.publish('san:monitor_update',str);
+				pub.publish('san:monitor_update','{"msg":"'+str+'"}');
 			}
 		});
 	}
