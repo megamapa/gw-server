@@ -397,7 +397,7 @@ class Device {
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
-			//console.log(packg);
+			console.log(packg);
 			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
 			// Next
