@@ -522,9 +522,9 @@ const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, passw
 const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 
 // Updates server status as soon as it successfully connects
-hub.on('connect', function () { GetDate().then(dte => { console.log('\033[36m'+dte+' \033[32mHUB connected.\033[0;0m');
+pub.on('connect', function () { GetDate().then(dte => { console.log('\033[36m'+dte+' \033[32mHUB connected.\033[0;0m');
 														console.log('\033[36m'+dte+' \033[32mWaiting clients...\033[0;0m'); });
-});
+													});
 
 /****************************************************************************************************/
 /* Create and open MySQL connection																	*/
@@ -537,20 +537,21 @@ var starttime=0,numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
 // Update statistics ever 60s
 setInterval(function() {
-			// Get datetime
-			let dte = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
 			// Publish update status
 			PublishUpdate();
-			// Update database
-			db.getConnection(function(err,connection){
-				if (!err) {
-					connection.query('INSERT INTO syslog (datlog,server,version,ipport,devices,msgsin,msgsout,bytsin,bytsout,bytserr) VALUES (?,?,?,?,?,?,?,?,?,?)',[dte, process.title, Version, process.env.SrvIP + ':' + process.env.SrvPort, numdev, msgsin, msgsout, bytsin, bytsout, bytserr],function (err, result) {connection.release(); if (err) err => console.error(err);});
-				}
-				msgsin=0;
-				msgsout=0;
-				bytsin=0;
-				bytsout=0;
-				bytserr=0;
+			// Get datetime
+			GetDate().then(dte => {
+				// Update database
+				db.getConnection(function(err,connection){
+					if (!err) {
+						connection.query('INSERT INTO syslog (datlog,server,version,ipport,devices,msgsin,msgsout,bytsin,bytsout,bytserr) VALUES (?,?,?,?,?,?,?,?,?,?)',[dte, process.title, Version, process.env.SrvIP + ':' + process.env.SrvPort, numdev, msgsin, msgsout, bytsin, bytsout, bytserr],function (err, result) {connection.release(); if (err) err => console.error(err);});
+					}
+					msgsin=0;
+					msgsout=0;
+					bytsin=0;
+					bytsout=0;
+					bytserr=0;
+				});
 			});
 },60000);
 
