@@ -404,10 +404,10 @@ class Device {
 			y=packg.indexOf(0x7d,y+1);
 		}
 		// Calcula o check digit
-		let checkdigit = packg[1];
+		let checkdigit = packg[0];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
-		if (checkdigit == packg[packg.length-2]) {
+		if (checkdigit == packg[packg.length-1]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			// Testar os subpacotes
