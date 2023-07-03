@@ -118,40 +118,40 @@ class Device {
 						while (y<b) {
 							switch (log[y]) {
 								case 0x01 : 
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Mileage: '+lh(y+2)+'</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Mileage: '+lh(y+2)+'</span></div>';
 									break;
 								case 0x02 : 
-									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Oil quantity: '+ih(y+2)+'</span></div>';
+									bdy+="<div class='oilquantity tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Oil quantity: '+ih(y+2)+'</span></div>';
 									break;
 								case 0x03 : 
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Drive record: '+ih(y+2)+'</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Drive record: '+ih(y+2)+'</span></div>';
 									break;
 								case 0x14 : 
-									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video alarm: '+lh(y+2)+'</span></div>';
+									bdy+="<div class='oilquantity tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video alarm: '+lh(y+2)+'</span></div>';
 									break;
 								case 0x15 : 
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign loss alarm status: '+lh(y+2)+'</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign loss alarm status: '+lh(y+2)+'</span></div>';
 									break;
 								case 0x16 : 
-									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign blocking alarm status: '+lh(y+2)+'</span></div>';
+									bdy+="<div class='oilquantity tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Video sign blocking alarm status: '+lh(y+2)+'</span></div>';
 									break;
 								case 0x17 : 
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Memory failure alarm status: '+ih(y+2)+'</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Memory failure alarm status: '+ih(y+2)+'</span></div>';
 									break;
 								case 0x18 : 
-									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Abnormal driving behavior alarm: '+ih(y+2)+'</span></div>';
+									bdy+="<div class='oilquantity tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+'<span class=tooltiptext>Abnormal driving behavior alarm: '+ih(y+2)+'</span></div>';
 									break;
 								case 0x2b : 
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Power line voltage/capacity: '+ih(y+2)+'V '+ih(y+4)+'%</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+hh(y+3)+hh(y+4)+hh(y+5)+'<span class=tooltiptext>Power line voltage/capacity: '+ih(y+2)+'V '+ih(y+4)+'%</span></div>';
 									break;
 								case 0x30 :
-									bdy+='<div class="oilquantity tooltip">'+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Wireless signal intensity: '+log[y+2]+'</span></div>';
+									bdy+="<div class='oilquantity tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Wireless signal intensity: '+log[y+2]+'</span></div>';
 									break;
 								case 0x31 :
-									bdy+='<div class="mileage tooltip">'+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Number of satellites: '+log[y+2]+'</span></div>';
+									bdy+="<div class='mileage tooltip'>"+hh(y)+hh(y+1)+hh(y+2)+'<span class=tooltiptext>Number of satellites: '+log[y+2]+'</span></div>';
 									break;
 								default:
-									bdy+='<div class="warning tooltip">'+hh(y)+hh(y+1);
+									bdy+="<div class='warning tooltip'>"+hh(y)+hh(y+1);
 									for (let x=y;x<y+log[y+1];x++) {bdy+=hh(x)}
 									bdy+='<span class=tooltiptext>Unknow</span></div>';
 							}
@@ -162,8 +162,8 @@ class Device {
 										
 					case 0x0704 : // Upload location data in batches
 						str+='Upload location data';
-						bdy ='<div class="numberofitens tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Number of itens: '+ih(13)+'</span></div>';
-						bdy+='<div class="result tooltip">'+hh(15)+'<span class=tooltiptext>Location type: ';
+						bdy ="<div class='numberofitens tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Number of itens: '+ih(13)+'</span></div>';
+						bdy+="<div class='result tooltip'>"+hh(15)+'<span class=tooltiptext>Location type: ';
 						switch (log[15]) {
 							case 0 : 
 								bdy+='0: Normal position batch report</span></div>';
@@ -173,7 +173,7 @@ class Device {
 								break;
 						}
 
-						bdy+='<div class="authcode tooltip">';
+						bdy+="<div class='authcode tooltip'>";
 						for (let x=16; x<b; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Authentication code: </span></div>';
 
@@ -195,8 +195,8 @@ class Device {
 										
 					case 0x8001 : // Platform general response
 						str+='Platform general response';
-						bdy ='<div class="serialreplay tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
-						bdy+='<div class="terminalmsg tooltip">'+hh(15)+hh(16)+'<span class=tooltiptext>Response message: '+ih(15)+'</span></div>';
+						bdy ="<div class='serialreplay tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
+						bdy+="<div class='terminalmsg tooltip'>"+hh(15)+hh(16)+'<span class=tooltiptext>Response message: '+ih(15)+'</span></div>';
 						bdy+="<div class='result tooltip'>"+hh(17)+"<span class=tooltiptext>Result: ";
 						switch (log[17]) {
 							case 0 : 
@@ -234,25 +234,25 @@ class Device {
 					
 					case 0x0100 : // Terminal registration
 						str+='Terminal registration';
-						bdy ='<div class="provincialid tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Provincial ID: '+ih(13)+'</span></div>';
-						bdy+='<div class="citycoutryid tooltip">'+hh(15)+hh(16)+'<span class=tooltiptext>City county ID: '+ih(15)+'</span></div>';
-						bdy+='<div class="manufacturerid tooltip">'+hh(17)+hh(18)+hh(19)+hh(20)+hh(21)+'<span class=tooltiptext>Manufacturer ID: '+ch(17)+ch(18)+ch(19)+ch(20)+ch(21)+'</span></div>';
+						bdy ="<div class='provincialid tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Provincial ID: '+ih(13)+'</span></div>';
+						bdy+="<div class='citycoutryid tooltip'>"+hh(15)+hh(16)+'<span class=tooltiptext>City county ID: '+ih(15)+'</span></div>';
+						bdy+="<div class='manufacturerid tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+hh(21)+'<span class=tooltiptext>Manufacturer ID: '+ch(17)+ch(18)+ch(19)+ch(20)+ch(21)+'</span></div>';
 
-						bdy+='<div class="terminaltype tooltip">';
+						bdy+="<div class='terminaltype tooltip'>";
 						for (let x=22; x<42; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Terminal type: ';
 						for (let x=22; x<42; x++) {bdy+=ch(x)}
 						bdy+='</span></div>';
 
-						bdy+='<div class="terminalid tooltip">';
+						bdy+="<div class='terminalid tooltip'>";
 						for (let x=42; x<49; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Terminal ID: ';
 						for (let x=42; x<49; x++) {bdy+=ch(x)}
 						bdy+='</span></div>';
 
-						bdy+='<div class="licenseplatecolor tooltip">'+hh(49)+'<span class=tooltiptext>License plate color</span></div>';
+						bdy+="<div class='licenseplatecolor tooltip'>"+hh(49)+'<span class=tooltiptext>License plate color</span></div>';
 
-						bdy+='<div class="vehicleid tooltip">';
+						bdy+="<div class='vehicleid tooltip'>";
 						for (let x=50; x<b; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Vehicle ID: ';
 						for (let x=50; x<b; x++) {bdy+=ch(x)}
@@ -262,8 +262,8 @@ class Device {
 
 					case 0x8100 : // Terminal registration reply
 						str+='Terminal registration reply';
-						bdy ='<div class="serialreplay tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
-						bdy+='<div class="result tooltip">'+hh(15)+'<span class=tooltiptext>Result: ';
+						bdy ="<div class='serialreplay tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
+						bdy+="<div class='result tooltip'>"+hh(15)+'<span class=tooltiptext>Result: ';
 						switch (log[15]) {
 							case 0 : 
 								bdy+='0: Successful</span></div>';
