@@ -105,7 +105,7 @@ class Device {
 						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;}
 						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;}
 						str+='Location information report';
-						bdy ='<div class="alarmsign tooltip">'+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
+						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
 						bdy+='<div class="status tooltip">'+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
 						bdy+='<div class="latitude tooltip">'+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
 						bdy+='<div class="longitude tooltip">'+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
@@ -197,7 +197,7 @@ class Device {
 						str+='Platform general response';
 						bdy ='<div class="serialreplay tooltip">'+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
 						bdy+='<div class="terminalmsg tooltip">'+hh(15)+hh(16)+'<span class=tooltiptext>Response message: '+ih(15)+'</span></div>';
-						bdy+='<div class="result tooltip">'+hh(17)+'<span class=tooltiptext>Result: ';
+						bdy+="<div class='result tooltip'>"+hh(17)+"<span class=tooltiptext>Result: ";
 						switch (log[17]) {
 							case 0 : 
 								bdy+='0: Successful</span></div>';
