@@ -268,7 +268,7 @@ class Device {
 							case 0 : 
 								bdy+='0: Successful</span></div>';
 
-								bdy+='<div class="authcode tooltip">';
+								bdy+="<div class='authcode tooltip'>";
 								for (let x=16; x<b; x++) {bdy+=hh(x)}
 								bdy+='<span class=tooltiptext>Authentication code: ';
 								for (let x=16; x<b; x++) {bdy+=ch(x)}
