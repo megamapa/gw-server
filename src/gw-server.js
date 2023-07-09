@@ -87,7 +87,7 @@ class Device {
 		function ih(ii) {return log[ii]*256+log[ii+1]}
 		function lh(ii) {return (log[ii]*256+log[ii+1])*65536+(log[ii+2]*256+log[ii+3])}
 		function hh(ii) {let h=log[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
-		function ch(ii) {return String.fromCharCode(log[ii]);}
+		function ch(ii) {if (log[ii]<32) {return ' '} else {return String.fromCharCode(log[ii]);}}
 		function ft(ss) {return '('+ss.substring(1,3)+') '+ss.substring(3,8)+'-'+ss.substring(8,12);}
 		// Verifica se a chave existe indicando que o cliente ainda esta conectado
 		hub.exists('log:'+this.did, async function (err, result) {
