@@ -301,13 +301,13 @@ class Device {
 					case 0x0003 : // Terminal desconnection
 						str+='Terminal desconnection';
 						break;
-					}
+				}
 
 				let tn = hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10);
 				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x01ff)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :"+ft(tn)+"</span></div>";
 				str+="<div class='messageserial tooltip'>"+hh(11)+hh(12)+"<span class=tooltiptext>Serial msg: "+ih(11)+"</span></div>";
 				str+=bdy+"<div class='checkdigit tooltip'>"+hh(log.length-2)+"<span class=tooltiptext>Check digit</span></div><div class='identification tooltip'>"+hh(log.length-1)+"<span class=tooltiptext>End identification</span></div></li>";
-				// Publish data
+				// Publica o log no SAN
 				pub.publish('san:monitor_update','{"msg":"'+str+'"}');
 			}
 		});
@@ -413,11 +413,7 @@ class Device {
 
 			// Verifica se é a primeira mensagem
 			if (this.did==='') { this.InitDevice(hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10)); }
-			// Atualiza contadores de msg
-			this.bytin+=packg.length;
-			this.msgin++;
-			msgsin++;
-			// Publish Log
+			// Publica o Log no SAN
 			this.GWPublishLog(packg);
 			// Processa a informação conforme o tipo de pacote
 			let PkgType = ih(1);	// Packge Type
@@ -443,6 +439,10 @@ class Device {
 					break;
 
 			}
+			// Atualiza contadores de msg
+			this.bytin+=packg.length;
+			this.msgin++;
+			msgsin++;	
 		}
 	}
 
@@ -506,7 +506,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 /****************************************************************************************************/
-/* Create and open Redis connection																	*/
+/* Cria e abre uma conexão do Redis																	*/
 /****************************************************************************************************/
 const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
@@ -518,7 +518,7 @@ pub.on('connect', function () { GetDate().then(dte => { console.log('\033[36m'+d
 													});
 
 /****************************************************************************************************/
-/* Create and open MySQL connection																	*/
+/* Cria e abre uma conexão MySQL																	*/
 /****************************************************************************************************/
 const mysql = require('mysql');
 const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
@@ -526,13 +526,13 @@ const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_n
 // Initialize global variables
 var starttime=0,numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
-// Update statistics ever 60s
+// Atualiza estatisticas a cada 60s
 setInterval(function() {
-			// Publish update status
+			// Publica estatus do serviço
 			PublishUpdate();
-			// Get datetime
+			// Pega data e hora
 			GetDate().then(dte => {
-				// Update database
+				// Grava contadores para estatísticas
 				db.getConnection(function(err,connection){
 					if (!err) {
 						connection.query('INSERT INTO syslog (datlog,server,version,ipport,devices,msgsin,msgsout,bytsin,bytsout,bytserr) VALUES (?,?,?,?,?,?,?,?,?,?)',[dte, process.title, Version, process.env.SrvIP + ':' + process.env.SrvPort, numdev, msgsin, msgsout, bytsin, bytsout, bytserr],function (err, result) {connection.release(); if (err) err => console.error(err);});
@@ -547,28 +547,31 @@ setInterval(function() {
 },60000);
 
 /****************************************************************************************************/
-/* Create and open server connection																*/
+/* Cria uma conexão e fica ouvindo o IP/Porta														*/
 /****************************************************************************************************/
 const net = require('net');
 const server = net.createServer(OpenDevice);
 server.listen(process.env.SrvPort, process.env.SrvIP);
 
-// Updates server status as soon as it successfully connects
-server.on('listening', function () { PublishUpdate(); GetDate().then(dte => { 	
-	console.log('\033[36m'+dte+' \033[32mServer ready.\033[0;0m');
-	}); 
+// Atualiza o status do servidor no SAN assim que estiver pronto 
+server.on('listening', function () { GetDate().then(dte => { // Imprime no terminal 	
+															 console.log('\033[36m'+dte+' \033[32mAguardando clientes...\033[0;0m');
+															 // Salva data e hora de início
+													 		 starttime = Date.parse(dte);
+															 // Publica no SAN
+															 PublishUpdate(); 
+															}); 
 });
 
 /****************************************************************************************************/
-/* 	Show parameters and waiting clients																*/
+/* 	Mostra parâmetros no terminal e fica aguardado clientes											*/
 /****************************************************************************************************/
 const OS = require('os');
 GetDate().then(dte => {
-	// Save start datetime
-	starttime = Date.parse(dte);
-	// Show parameters and waiting clients
+	// Mostra parâmetros no terminal
 	console.log('\033[36m'+dte+' \033[37m================================');
 	console.log('\033[36m'+dte+' \033[37mAPP : ' + process.title + ' ('+Version+')');
 	console.log('\033[36m'+dte+' \033[37mIP/Port : ' + process.env.SrvIP + ':' + process.env.SrvPort);
 	console.log('\033[36m'+dte+' \033[37mCPUs: '+ OS.cpus().length);
-	console.log('\033[36m'+dte+' \033[37m================================\033[0;0m');});
+	console.log('\033[36m'+dte+' \033[37m================================\033[0;0m');
+});
