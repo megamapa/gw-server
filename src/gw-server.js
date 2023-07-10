@@ -515,12 +515,13 @@ const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, passw
 // Updates server status as soon as it successfully connects
 pub.on('connect', function () { GetDate().then(dte => { // Imprime no terminal 
 														console.log('\033[36m'+dte+' \033[32mHUB conectado.\033[0;0m');
-														console.log('\033[36m'+dte+' \033[32mAguardando clientes...\033[0;0m'); });
+														console.log('\033[36m'+dte+' \033[32mAguardando clientes...\033[0;0m');
 														// Salva data e hora de início
 														starttime = Date.parse(dte);
 														// Publica no SAN
 														PublishUpdate();
 													   });
+							  });
 
 /****************************************************************************************************/
 /* Cria e abre uma conexão MySQL																	*/
