@@ -561,7 +561,6 @@ server.listen(process.env.SrvPort, process.env.SrvIP);
 // Atualiza o status do servidor no SAN assim que estiver pronto 
 server.on('listening', function () { GetDate().then(dte => { // Imprime no terminal 	
 															 console.log('\033[36m'+dte+' \033[32mServidor pronto.\033[0;0m');
-															 
 															}); 
 });
 
