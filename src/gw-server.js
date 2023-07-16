@@ -102,6 +102,9 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
+					
+					console.log(log);
+
 						let lat = lh(21); if (log[20] & 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] & 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
@@ -346,6 +349,10 @@ class Device {
 						}
 						break;
 
+					case 0x8104 : // Check terminal parameter
+						str+='Check terminal parameter';
+						break;
+						
 					case 0x0003 : // Terminal desconnection
 						str+='Terminal desconnection';
 						break;
