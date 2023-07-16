@@ -239,7 +239,7 @@ console.log(log[20] & 2);
 						bdy ="<div class='authcode tooltip'>";
 						for (let x=13; x<b; x++) {bdy+=hh(x)}
 						bdy+='<span class=tooltiptext>Authentication code: ';
-						for (let x=13; x<b; x++) {bdy+=ch(x)}
+						for (let x=13; x<b; x++) {bdy+=hh(x)}
 						bdy+='</span></div>';
 						break;
 					
