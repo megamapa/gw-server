@@ -102,18 +102,15 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
-
-					console.log(log);
-console.log(log[20] && 2);
-						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
-						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
+						let lat = lh(21); if (log[20] & 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
+						let lng = lh(25); if (log[20] & 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
 						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarmes: </span></div>';
 						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status<br>';
-						if (log[20] && 1 == 1) {bdy+='ACC: on<br>';} else {bdy+='ACC: off<br>'}
-						if (log[20] && 2 == 2) {bdy+='Posição: Válida<br>';} else {bdy+='Posição: Inválida<br>'}
-						if (log[20] && 4 == 4) {bdy+='Latitude: Sul<br>';} else {bdy+='Latitude: Norte<br>'}
-						if (log[20] && 8 == 8) {bdy+='Longitude: Oeste<br>';} else {bdy+='Longitude: Leste<br>'}
+						if (log[20] & 1 == 1) {bdy+='ACC: on<br>';} else {bdy+='ACC: off<br>'}
+						if (log[20] & 2 == 2) {bdy+='Posição: Válida<br>';} else {bdy+='Posição: Inválida<br>'}
+						if (log[20] & 4 == 4) {bdy+='Latitude: Sul<br>';} else {bdy+='Latitude: Norte<br>'}
+						if (log[20] & 8 == 8) {bdy+='Longitude: Oeste<br>';} else {bdy+='Longitude: Leste<br>'}
 
 			
 						
