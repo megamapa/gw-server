@@ -107,8 +107,11 @@ class Device {
 						str+='Location information report';
 						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarmes: </span></div>';
 						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status<br>';
-						bdy+='<br>ACC: '+(log[20] & 1) ? 'on' : 'off';
-						bdy+='<br>Posição: '+(log[20] & 2) ? 'Válida' : 'Inválida';
+
+						bdy+='<br>ACC: ';
+						if (log[20] & 1) {bdy+='on'} else {bdy+='on'}
+						bdy+='<br>Posição: ';
+						if (log[20] & 2) {bdy+='Válida'} else {bdy+='Inválida'}
 						bdy+='<br>Latitude: '+(log[20] & 4) ? 'Sul' : 'Norte';
 						bdy+='<br>Longitude: '+(log[20] & 8) ? 'Oeste' : 'Leste';
 						bdy+='<br>Em movimento: '+(log[20] & 16) ? 'Sim' : 'Não';
