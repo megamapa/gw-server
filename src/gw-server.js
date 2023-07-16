@@ -352,7 +352,7 @@ class Device {
 				}
 
 				let tn = hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10);
-				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x03ff)+"<br>Sub-package: "+(ih(3) & 0x2000)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :"+ft(tn)+"</span></div>";
+				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x03ff)+"<br>Sub-package: "+(ih(3) & 0x2000)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :<br>"+ft(tn)+"</span></div>";
 				str+="<div class='messageserial tooltip'>"+hh(11)+hh(12)+"<span class=tooltiptext>Serial msg: "+ih(11)+"</span></div>";
 				str+=bdy+"<div class='checkdigit tooltip'>"+hh(log.length-2)+"<span class=tooltiptext>Check digit</span></div><div class='identification tooltip'>"+hh(log.length-1)+"<span class=tooltiptext>End identification</span></div></li>";
 				// Publica o log no SAN
@@ -480,6 +480,7 @@ class Device {
 
 				case 0x0102 : // Terminal autentication
 					this.GWTerminalAutentication(packg);
+					this.GWMakeReply(0x8104, '');
 					break;
 
 				case 0x0100 : // Terminal registration
