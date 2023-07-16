@@ -304,7 +304,7 @@ class Device {
 				}
 
 				let tn = hh(5)+hh(6)+hh(7)+hh(8)+hh(9)+hh(10);
-				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x01ff)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :"+ft(tn)+"</span></div>";
+				str+="</span></div><div class='packlength tooltip'>"+hh(3)+hh(4)+"<span class=tooltiptext>Body length: "+(ih(3) & 0x03ff)+"<br>Sub-package: "+(ih(3) & 0x2000)+"</span></div><div class='terminalnumber tooltip'>"+tn+"<span class=tooltiptext>Terminal number :"+ft(tn)+"</span></div>";
 				str+="<div class='messageserial tooltip'>"+hh(11)+hh(12)+"<span class=tooltiptext>Serial msg: "+ih(11)+"</span></div>";
 				str+=bdy+"<div class='checkdigit tooltip'>"+hh(log.length-2)+"<span class=tooltiptext>Check digit</span></div><div class='identification tooltip'>"+hh(log.length-1)+"<span class=tooltiptext>End identification</span></div></li>";
 				// Publica o log no SAN
@@ -448,32 +448,31 @@ class Device {
 
 	async IncomingDevice(data) {
 		bytsin+=data.length;
-		// Processa os dados do buffer
-		if (data.length > 14) {
-			// Verifica se a linha comeca com 0x7e
-			if (data[0]==0x7e) {
-				// Decodifica a linha
-				await this.GWParse(Array.from(data));
-			} else {bytserr+=data.length;}
+		// Verifica se a linha comeca com 0x7e
+		if (data[0]==0x7e) {
+			// Decodifica a linha
+			await this.GWParse(Array.from(data));
 		} else {bytserr+=data.length;}
 	} 
 
 	async CloseDevice() {
-		// Verifica se a conexão foi de um device valido
+		// Verifica se a conexão foi de um device válido
 		if (this.did!=='') {
-			// Get logout datetime
-			this.logout = new Date(new Date().getTime()).toISOString().replace(/T/,' ').replace(/\..+/, '');
-			// Grava log da conexão do device
 			let th=this;
-			db.getConnection(function (err, connection) {
-				if (!err) {
-					connection.query('INSERT INTO devlog (did,login,logout,bytin,bytout,msgin,msgout) VALUES (?,?,?,?,?,?,?)', [th.did, th.login, th.logout, th.bytin, th.bytout, th.msgin, th.msgout], function (err, result) { connection.release(); if (err) { err => console.error(err); } });
-				}
-			});
-			// Publish logout
-			this.PublishDevice('"datetime":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err));
+			// Pega data e hora de logout
+			GetDate().then(dte => {
+				this.logout = dte;
+				// Grava log da conexão do device
+				db.getConnection(function (err, connection) {
+					if (!err) {
+						connection.query('INSERT INTO devlog (did,login,logout,bytin,bytout,msgin,msgout) VALUES (?,?,?,?,?,?,?)', [th.did, th.login, th.logout, th.bytin, th.bytout, th.msgin, th.msgout], function (err, result) { connection.release(); if (err) { err => console.error(err); } });
+					}
+				});
+				// Publish logout
+				this.PublishDevice('"datetime":"'+this.logout+'","type":"logout","err":"'+this.err+'"').catch(err => console.error(err));
+			});	
 			// Publish log
-			this.PublishTxt('<div class=warning>Disconnected: '+this.err+'</div>');
+			this.PublishTxt('<div class=warning>Desconectado: '+this.err+'</div>');
 			numdev--;
 		}	
 	}
@@ -485,8 +484,8 @@ async function OpenDevice(socket) {
 	
 	socket.on('data',function(data){ device.IncomingDevice(data); });
 	socket.on('close',async function(){ await device.CloseDevice(); delete device; });
-	socket.on('end',function(){ device.err='0-Normal end'; device.usocket.destroy(); });
-	socket.on('error',function(){ device.err = '1-Error'; device.usocket.destroy(); });
+	socket.on('end',function(){ device.err='0-Normal'; device.usocket.destroy(); });
+	socket.on('error',function(){ device.err = '1-Erro'; device.usocket.destroy(); });
 	// Close connection when inactive (5 min)
 	socket.setTimeout(300000,function(){ device.err='2-Timeout'; device.usocket.destroy(); });
 }
@@ -512,7 +511,7 @@ const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 
-// Updates server status as soon as it successfully connects
+// Envia o estatus para o SAN assim que a conexão for estabelicida 
 pub.on('connect', function () { GetDate().then(dte => { // Imprime no terminal 
 														console.log('\033[36m'+dte+' \033[32mHUB conectado.\033[0;0m');
 														console.log('\033[36m'+dte+' \033[32mAguardando clientes...\033[0;0m');
@@ -521,7 +520,8 @@ pub.on('connect', function () { GetDate().then(dte => { // Imprime no terminal
 														// Publica no SAN
 														PublishUpdate();
 													   });
-							  });
+							  }
+);
 
 /****************************************************************************************************/
 /* Cria e abre uma conexão MySQL																	*/
@@ -532,7 +532,7 @@ const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_n
 // Initialize global variables
 var starttime=0,numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
-// Atualiza estatisticas a cada 60s
+// Atualiza estatísticas a cada 60s
 setInterval(function() {
 			// Publica estatus do serviço
 			PublishUpdate();
@@ -559,14 +559,11 @@ const net = require('net');
 const server = net.createServer(OpenDevice);
 server.listen(process.env.SrvPort, process.env.SrvIP);
 
-// Atualiza o status do servidor no SAN assim que estiver pronto 
-server.on('listening', function () { GetDate().then(dte => { // Imprime no terminal 	
-															 console.log('\033[36m'+dte+' \033[32mServidor pronto.\033[0;0m');
-															}); 
-});
+// Imprime o status no terminal assim que estiver pronto 
+server.on('listening', function () { GetDate().then(dte => { console.log('\033[36m'+dte+' \033[32mServidor pronto.\033[0;0m'); }); });
 
 /****************************************************************************************************/
-/* 	Mostra parâmetros no terminal e fica aguardado clientes											*/
+/* Mostra parâmetros no terminal e fica aguardado clientes											*/
 /****************************************************************************************************/
 const OS = require('os');
 GetDate().then(dte => {
