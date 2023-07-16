@@ -105,11 +105,18 @@ class Device {
 						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
-						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarm sign: </span></div>';
-						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status: </span></div>';
-						bdy+="<div class='latitude tooltip'>"+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
+						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarmes: </span></div>';
+						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status<br>';
+						if (log[20] && 1 == 1) {bdy+='ACC: on<br>';} else {bdy+='ACC: off<br>'}
+						if (log[20] && 2 == 2) {bdy+='Posição: Válida<br>';} else {bdy+='Posição: Inválida<br>'}
+						if (log[20] && 4 == 4) {bdy+='Latitude: Sul<br>';} else {bdy+='Latitude: Norte<br>'}
+						if (log[20] && 8 == 8) {bdy+='Longitude: Oeste<br>';} else {bdy+='Longitude: Leste<br>'}
+
+						
+						
+						bdy+="</span></div><div class='latitude tooltip'>"+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
 						bdy+="<div class='longitude tooltip'>"+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
-						bdy+="<div class='elevation tooltip'>"+hh(29)+hh(30)+'<span class=tooltiptext>Elevation: '+ih(29)+'m</span></div>';
+						bdy+="<div class='elevation tooltip'>"+hh(29)+hh(30)+'<span class=tooltiptext>Altitude: '+ih(29)+'m</span></div>';
 						bdy+="<div class='speed tooltip'>"+hh(31)+hh(32)+'<span class=tooltiptext>Speed: '+ih(31)+'km/h</span></div>';
 						bdy+="<div class='direction tooltip'>"+hh(33)+hh(34)+'<span class=tooltiptext>Direction: '+ih(33)+'o</span></div>';
 						bdy+="<div class='localtime tooltip'>"+hh(35)+hh(36)+hh(37)+hh(38)+hh(39)+hh(40)+'<span class=tooltiptext>Local time: '+hh(35)+'-'+hh(36)+'-'+hh(37)+' '+hh(38)+':'+hh(39)+':'+hh(40)+'</span></div>';
@@ -234,7 +241,7 @@ class Device {
 					
 					case 0x0100 : // Terminal registration
 						str+='Terminal registration';
-						bdy ="<div class='provincialid tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Provincial ID: '+ih(13)+'</span></div>';
+						bdy ="<div class='provincialid tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Province ID: '+ih(13)+'</span></div>';
 						bdy+="<div class='citycoutryid tooltip'>"+hh(15)+hh(16)+'<span class=tooltiptext>City county ID: '+ih(15)+'</span></div>';
 						bdy+="<div class='manufacturerid tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+hh(21)+'<span class=tooltiptext>Manufacturer ID: '+ch(17)+ch(18)+ch(19)+ch(20)+ch(21)+'</span></div>';
 
