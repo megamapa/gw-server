@@ -138,7 +138,7 @@ class Device {
 						if (tmp=='') {bdy+='Nenhuma'} else {bdy+=tmp.substring(0,tmp.length-1);}
 
 						bdy+='<br>Constelações: ';
-						let tmp = '';
+						tmp = '';
 						if (log[18] & 4) {tmp+='GPS,'}
 						if (log[18] & 8) {tmp+='BEIDOU,'}
 						if (log[18] & 16) {tmp+='GLONASS,'}
