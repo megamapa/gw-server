@@ -25,6 +25,7 @@ class Device {
 		this.msgin=0;
 		this.msgout=0;
 		this.err='';
+		this.buff='';
 		this.mpnum=[]; // Mobile phone number
 		this.msnum=0; // Mensagem serial number
 
@@ -104,7 +105,8 @@ class Device {
 					case 0x0200 : // Location information report
 					
 					console.log(log);
-
+			
+				
 						let lat = lh(21); if (log[20] & 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] & 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
@@ -503,12 +505,29 @@ class Device {
 	}
 
 	async IncomingDevice(data) {
-		bytsin+=data.length;
-		// Verifica se a linha comeca com 0x7e
-		if (data[0]==0x7e) {
-			// Decodifica a linha
-			await this.GWParse(Array.from(data));
-		} else {bytserr+=data.length;}
+		// Adciona os dados recebidos ao buffer
+		this.buff+=data;
+		// Começa a tratar o buffer
+		while (true) {
+			// Verifica se o pack comeca com 0x7e
+			if (this.buff[0]==0x7e) {
+				// Procura o final do pack
+				let i = this.buff.indexOf(0x7e,1);
+				// Se nao achou sai
+				if (i==-1) {break;}
+				// Extrai o pack do buffer
+				let ln = this.buff.substring(0, i);
+				this.buff=this.buff.substring(i+1);
+				// Atualiza contador
+				bytsin+=ln.length;
+				// Decodifica a linha
+				await this.GWParse(Array.from(ln));
+			} else {bytserr+=this.buff.length; this.buff='';}
+			// Se o buffer estiver vazio sai
+			if (this.buff=='') {break;}
+			// Se o buffer estiver cheio zera e sai
+			if (this.buff.length > 4000) {bytserr+=this.buff.length; this.buff=''; break;}
+		}
 	} 
 
 	async CloseDevice() {
