@@ -221,22 +221,22 @@ class Device {
 								break;
 						}
 
-						bdy+="<div class='authcode tooltip'>";
-						for (let x=16; x<b; x++) {bdy+=hh(x)}
-						bdy+='<span class=tooltiptext>Authentication code: </span></div>';
+						
 
 
-					/*	let y = 16;     // Inicio do buffer
+						y = 16;     // Inicio do buffer
 						let c = ih(13); // Quantidade de blocos a serem processados
 						while (c > 0) {
-							let x =ih(y); // Tamando do bloco
+							let b = ih(y); // Tamando do bloco
+							bdy+="<div class='packlength tooltip'>"+hh(y)+hh(y+1)+"<span class=tooltiptext>Tamanho do pack: "+ih(y)+"</span></div>";
+							y+=2;
 
-
-							bdy+=hh(y)
-
+							bdy+="<div class='authcode tooltip'>";
+							for (let x=y; x<b; x++) {bdy+=hh(x)}
+							bdy+='<span class=tooltiptext>Authentication code: </span></div>';
 
 							c--;
-						}*/
+						}
 
 
 						break;
