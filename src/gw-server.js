@@ -102,22 +102,49 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
-
-					console.log(log);
-console.log(log[20] & 2);
-
 						let lat = lh(21); if (log[20] & 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] & 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
 						bdy ="<div class='alarmsign tooltip'>"+hh(13)+hh(14)+hh(15)+hh(16)+'<span class=tooltiptext>Alarmes: </span></div>';
 						bdy+="<div class='status tooltip'>"+hh(17)+hh(18)+hh(19)+hh(20)+'<span class=tooltiptext>Status<br>';
-						if (log[20] & 1) {bdy+='ACC: on<br>';} else {bdy+='ACC: off<br>'}
-						if (log[20] & 2) {bdy+='Posição: Válida<br>';} else {bdy+='Posição: Inválida<br>'}
-						if (log[20] & 4) {bdy+='Latitude: Sul<br>';} else {bdy+='Latitude: Norte<br>'}
-						if (log[20] & 8) {bdy+='Longitude: Oeste<br>';} else {bdy+='Longitude: Leste<br>'}
+						bdy+='<br>ACC: '+log[20] & 1 ? 'on' : 'off';
+						bdy+='<br>Posição: '+log[20] & 2 ? 'Válida' : 'Inválida';
+						bdy+='<br>Latitude: '+log[20] & 4 ? 'Sul' : 'Norte';
+						bdy+='<br>Longitude: '+log[20] & 8 ? 'Oeste' : 'Leste';
+						bdy+='<br>Em movimento: '+log[20] & 16 ? 'Sim' : 'Não';
+						bdy+='<br>Posição encriptada: '+log[20] & 32 ? 'Sim' : 'Não';
+						bdy+='<br>';
+						switch (log[19] & 3) {
+							case 0x00 : 
+								bdy+="Carga: Vazio";
+								break;
+							case 0x01 : 
+								bdy+="Carga: Metade";
+								break;
+							case 0x03 : 
+								bdy+="Carga: Cheio";
+								break;
+						}
+						bdy+='<br>Combustível: '+log[19] & 4 ? 'Ligado' : 'Desligado';
+						bdy+='<br>Elêtrica: '+log[19] & 8 ? 'Ligado' : 'Desligado';
+						bdy+='<br>Portas: '+log[19] & 16 ? 'Trancadas' : 'Destrancadas';
+						bdy+='<br>Portas abertas: ';
+						let tmp = '';
+						if (log[19] & 32) {tmp+='Porta 1,'}
+						if (log[19] & 64) {tmp+='Porta 2,'}
+						if (log[19] & 128) {tmp+='Porta 3,'}
+						if (log[18] & 1) {tmp+='Porta 4,'}
+						if (log[18] & 2) {tmp+='Porta 5,'}
+						if (tmp=='') {bdy+='Nenhuma'} else {bdy+=tmp.substring(0,tmp.length-1);}
 
-			
-						
+						bdy+='<br>Constelações: ';
+						let tmp = '';
+						if (log[18] & 4) {tmp+='GPS,'}
+						if (log[18] & 8) {tmp+='BEIDOU,'}
+						if (log[18] & 16) {tmp+='GLONASS,'}
+						if (log[18] & 32) {tmp+='GALILEO,'}
+						if (tmp=='') {bdy+='Nenhuma'} else {bdy+=tmp.substring(0,tmp.length-1);}
+
 						bdy+="</span></div><div class='latitude tooltip'>"+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
 						bdy+="<div class='longitude tooltip'>"+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
 						bdy+="<div class='elevation tooltip'>"+hh(29)+hh(30)+'<span class=tooltiptext>Altitude: '+ih(29)+'m</span></div>';
