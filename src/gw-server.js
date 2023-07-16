@@ -112,10 +112,14 @@ class Device {
 						if (log[20] & 1) {bdy+='on'} else {bdy+='on'}
 						bdy+='<br>Posição: ';
 						if (log[20] & 2) {bdy+='Válida'} else {bdy+='Inválida'}
-						bdy+='<br>Latitude: '+(log[20] & 4) ? 'Sul' : 'Norte';
-						bdy+='<br>Longitude: '+(log[20] & 8) ? 'Oeste' : 'Leste';
-						bdy+='<br>Em movimento: '+(log[20] & 16) ? 'Sim' : 'Não';
-						bdy+='<br>Posição encriptada: '+(log[20] & 32) ? 'Sim' : 'Não';
+						bdy+='<br>Latitude: ';
+						if (log[20] & 4) {bdy+='Sul'} else {bdy+='Norte'}
+						bdy+='<br>Longitude: ';
+						if (log[20] & 8) {bdy+='Oeste'} else {bdy+='Leste'}
+						bdy+='<br>Em movimento: ';
+						if (log[20] & 16) {bdy+='Sim'} else {bdy+='Não'}
+						bdy+='<br>Posição encriptada: ';
+						if (log[20] & 32) {bdy+='Sim'} else {bdy+='Não'}
 						bdy+='<br>';
 						switch (log[19] & 3) {
 							case 0x00 : 
@@ -128,9 +132,12 @@ class Device {
 								bdy+="Carga: Cheio";
 								break;
 						}
-						bdy+='<br>Combustível: '+log[19] & 4 ? 'Ligado' : 'Desligado';
-						bdy+='<br>Elêtrica: '+log[19] & 8 ? 'Ligado' : 'Desligado';
-						bdy+='<br>Portas: '+log[19] & 16 ? 'Trancadas' : 'Destrancadas';
+						bdy+='<br>Combustível: ';
+						if (log[19] & 4) {bdy+='Ligado'} else {bdy+='Desligado'}
+						bdy+='<br>Elêtrica: ';
+						if (log[19] & 8) {bdy+='Ligado'} else {bdy+='Desligado'}
+						bdy+='<br>Portas: ';
+						if (log[19] & 16) {bdy+='Trancadas'} else {bdy+='Destrancadas'}
 						bdy+='<br>Portas abertas: ';
 						let tmp = '';
 						if (log[19] & 32) {tmp+='Porta 1,'}
