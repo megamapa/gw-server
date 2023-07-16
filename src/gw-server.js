@@ -68,7 +68,7 @@ class Device {
 		// Publish login
 		this.PublishDevice('"datetime":"'+this.login+'","type":"login"').catch(err => console.error(err));
 		// Publish login
-		this.PublishTxt('<div class=warning>Connected</div>');
+		this.PublishTxt('<div class=warning>Conectado</div>');
 		numdev++;
 	}
 
@@ -102,6 +102,9 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
+
+					console.log(log);
+console.log(log[20] && 8);
 						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
@@ -112,7 +115,7 @@ class Device {
 						if (log[20] && 4 == 4) {bdy+='Latitude: Sul<br>';} else {bdy+='Latitude: Norte<br>'}
 						if (log[20] && 8 == 8) {bdy+='Longitude: Oeste<br>';} else {bdy+='Longitude: Leste<br>'}
 
-						
+			
 						
 						bdy+="</span></div><div class='latitude tooltip'>"+hh(21)+hh(22)+hh(23)+hh(24)+'<span class=tooltiptext>Latitude: '+lat+'</span></div>';
 						bdy+="<div class='longitude tooltip'>"+hh(25)+hh(26)+hh(27)+hh(28)+'<span class=tooltiptext>Longitude: '+lng+'</span></div>';
