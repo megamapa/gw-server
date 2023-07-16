@@ -104,7 +104,7 @@ class Device {
 					case 0x0200 : // Location information report
 
 					console.log(log);
-console.log(log[20] && 8);
+console.log(log[20] && 2);
 						let lat = lh(21); if (log[20] && 4 == 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] && 8 == 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
