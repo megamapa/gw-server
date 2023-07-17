@@ -511,6 +511,7 @@ class Device {
 		// Começa a tratar o buffer
 		while (true) {
 			// Verifica se o pack comeca com 0x7e
+			console.log(this.buff[0]);
 			if (this.buff[0]==0x7e) {
 				console.log(this.buff.toString());
 				// Procura o final do pack
