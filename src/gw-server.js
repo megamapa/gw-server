@@ -452,8 +452,11 @@ class Device {
 	async GWParse(packg) {
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
+
+
+		Console.log(packg);
 		// Faz o unescape do 0x7d
-		let y=packg.indexOf(0x7d,1);
+		let y=packg.indexOf('~',1);
 		while (y!=-1) {
 			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
@@ -519,7 +522,6 @@ class Device {
 				// Extrai o pack do buffer
 				let ln = this.buff.substring(0, i);
 				this.buff=this.buff.substring(i+1);
-				console.log(ln);
 				// Atualiza contador
 				bytsin+=ln.length;
 				// Decodifica a linha
