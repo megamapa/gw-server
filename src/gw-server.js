@@ -471,7 +471,7 @@ class Device {
 		//console.log(packg[packg.length-2]);
 
 
-		if (checkdigit != packg[packg.length-2]) {
+		if (checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			// Testar os subpacotes
