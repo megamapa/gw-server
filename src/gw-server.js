@@ -104,10 +104,6 @@ class Device {
 				let pkgtype = ih(1); // Tipo do pacote
 				switch (pkgtype) {
 					case 0x0200 : // Location information report
-					
-					console.log(log);
-			
-				
 						let lat = lh(21); if (log[20] & 4) {lat=lat*-1;} lat=lat / 1000000;
 						let lng = lh(25); if (log[20] & 8) {lng=lng*-1;} lng=lng / 1000000;
 						str+='Location information report';
@@ -230,7 +226,7 @@ class Device {
 						
 
 
-						y = 16;     // Inicio do buffer
+						let y = 16;     // Inicio do buffer
 						let c = ih(13); // Quantidade de blocos a serem processados
 						while (c > 0) {
 							let b = ih(y); // Tamando do bloco
@@ -453,7 +449,6 @@ class Device {
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 
-		console.log(packg);
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
@@ -466,11 +461,6 @@ class Device {
 		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
-
-		console.log(checkdigit); 
-		//console.log(packg[packg.length-2]);
-
-
 		if (checkdigit == packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
