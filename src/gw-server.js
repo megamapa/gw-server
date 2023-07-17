@@ -456,7 +456,7 @@ class Device {
 
 		console.log(packg);
 		// Faz o unescape do 0x7d
-		let y=packg.indexOf('~',1);
+		let y=packg.indexOf(0x7d,1);
 		while (y!=-1) {
 			if (packg[y+1]==0x02) {packg[y]=0x7e;}
 			packg.splice(y+1,1);
@@ -520,7 +520,7 @@ class Device {
 				// Se nao achou sai
 				if (i==-1) {break;}
 				// Extrai o pack do buffer
-				let ln = this.buff.substring(0, i);
+				let ln = this.buff.substring(0, i+1);
 				this.buff=this.buff.substring(i+1);
 				// Atualiza contador
 				bytsin+=ln.length;
@@ -532,7 +532,7 @@ class Device {
 				// Se nao achou sai
 				if (i==-1) {break;}
 				// Extrai o pack do buffer
-				this.desc = this.buff.substring(0, i);
+				this.desc = this.buff.substring(0, i+1);
 				this.buff=this.buff.substring(i+1);
 				// Atualiza contador
 				bytsin+=this.desc.length;
