@@ -26,6 +26,7 @@ class Device {
 		this.msgout=0;
 		this.err='';
 		this.buff='';
+		this.desc='';
 		this.mpnum=[]; // Mobile phone number
 		this.msnum=0; // Mensagem serial number
 
@@ -524,7 +525,17 @@ class Device {
 				bytsin+=ln.length;
 				// Decodifica a linha
 				await this.GWParse(Array.from(ln));
-			} else {bytserr+=this.buff.length; this.buff='';}
+			} else if (this.buff[0]==0x24) {
+				// Procura o final do pack
+				let i = this.buff.indexOf(0x23,1);
+				// Se nao achou sai
+				if (i==-1) {break;}
+				// Extrai o pack do buffer
+				this.desc = this.buff.substring(0, i);
+				this.buff=this.buff.substring(i+1);
+				// Atualiza contador
+				bytsin+=this.desc.length;
+			} else	{bytserr+=this.buff.length; this.buff='';}
 			// Se o buffer estiver vazio sai
 			if (this.buff=='') {break;}
 			// Se o buffer estiver cheio zera e sai
