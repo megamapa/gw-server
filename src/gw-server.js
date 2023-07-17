@@ -511,9 +511,7 @@ class Device {
 		// Começa a tratar o buffer
 		while (true) {
 			// Verifica se o pack comeca com 0x7e
-			console.log(this.buff[0]);
 			if (this.buff[0]=='~') {
-				console.log(this.buff.toString());
 				// Procura o final do pack
 				let i = this.buff.indexOf('~',1);
 				// Se nao achou sai
@@ -521,6 +519,7 @@ class Device {
 				// Extrai o pack do buffer
 				let ln = this.buff.substring(0, i);
 				this.buff=this.buff.substring(i+1);
+				console.log(ln);
 				// Atualiza contador
 				bytsin+=ln.length;
 				// Decodifica a linha
