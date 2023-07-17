@@ -464,7 +464,7 @@ class Device {
 		}
 		// Calcula o check digit
 		let checkdigit = packg[1];
-		for (let i = 2; i < packg.length-3; i++) { checkdigit ^= packg[i]; }
+		for (let i = 2; i < packg.length-1; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
 
 
