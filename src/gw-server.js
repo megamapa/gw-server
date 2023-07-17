@@ -508,6 +508,7 @@ class Device {
 		// Adciona os dados recebidos ao buffer
 		this.buff+=data;
 		// Começa a tratar o buffer
+		console.log(data);
 		while (true) {
 			// Verifica se o pack comeca com 0x7e
 			if (this.buff[0]==0x7e) {
