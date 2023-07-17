@@ -226,15 +226,15 @@ class Device {
 						
 
 
-						let y = 16;     // Inicio do buffer
+						let x = 16;     // Inicio do buffer
 						let c = ih(13); // Quantidade de blocos a serem processados
 						while (c > 0) {
 							let b = ih(y); // Tamando do bloco
-							bdy+="<div class='packlength tooltip'>"+hh(y)+hh(y+1)+"<span class=tooltiptext>Tamanho do pack: "+ih(y)+"</span></div>";
-							y+=2;
+							bdy+="<div class='packlength tooltip'>"+hh(x)+hh(x+1)+"<span class=tooltiptext>Tamanho do pack: "+ih(x)+"</span></div>";
+							x+=2;
 
 							bdy+="<div class='authcode tooltip'>";
-							for (let x=y; x<b; x++) {bdy+=hh(x)}
+							for (let z=x; z<b; z++) {bdy+=hh(z)}
 							bdy+='<span class=tooltiptext>Authentication code: </span></div>';
 
 							c--;
