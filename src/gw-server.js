@@ -453,7 +453,6 @@ class Device {
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 
-
 		console.log(packg);
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf(0x7d,1);
@@ -509,6 +508,7 @@ class Device {
 	}
 
 	async IncomingDevice(data) {
+		function strToByteArray(str) { return new TextEncoder().encode(str); }
 		// Adciona os dados recebidos ao buffer
 		this.buff+=data;
 		// Começa a tratar o buffer
@@ -525,7 +525,7 @@ class Device {
 				// Atualiza contador
 				bytsin+=ln.length;
 				// Decodifica a linha
-				await this.GWParse(Array.from(ln));
+				await this.GWParse(strToByteArray(ln));
 			} else if (this.buff[0]=='$') {
 				// Procura o final do pack
 				let i = this.buff.indexOf('#',1);
