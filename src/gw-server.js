@@ -464,14 +464,14 @@ class Device {
 		}
 		// Calcula o check digit
 		let checkdigit = packg[1];
-		for (let i = 2; i < packg.length-2; i++) { console.log(checkdigit); checkdigit ^= packg[i]; }
+		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
 		// Verifica o check digit
 
 		console.log(checkdigit); 
 		//console.log(packg[packg.length-2]);
 
 
-		if (checkdigit == packg[packg.length-2]) {
+		if (checkdigit != packg[packg.length-2]) {
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			// Testar os subpacotes
