@@ -454,7 +454,7 @@ class Device {
 		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 
 
-		Console.log(packg);
+		console.log(packg);
 		// Faz o unescape do 0x7d
 		let y=packg.indexOf('~',1);
 		while (y!=-1) {
