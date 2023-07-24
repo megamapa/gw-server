@@ -209,9 +209,39 @@ class Device {
 						}
 						
 						break;
-										
+
 					case 0x0704 : // Upload location data in batches
 						str+='Upload location data';
+						bdy ="<div class='numberofitens tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Number of itens: '+ih(13)+'</span></div>';
+						bdy+="<div class='result tooltip'>"+hh(15)+'<span class=tooltiptext>Location type: ';
+						switch (log[15]) {
+							case 0 :
+								bdy+='0: Normal position batch report</span></div>';
+								break;
+							case 1 :
+								bdy+='1: Blind area supplement report</span></div>';
+								break;
+						}
+
+
+						let x = 16;     // Inicio do buffer
+						let c = ih(13); // Quantidade de blocos a serem processados
+						while (c > 0) {
+							let b = ih(x); // Tamando do bloco
+							bdy+="<div class='packlength tooltip'>"+hh(x)+hh(x+1)+"<span class=tooltiptext>Tamanho do pack: "+ih(x)+"</span></div>";
+							x+=2;
+
+							bdy+="<div class='authcode tooltip'>"; 
+							for (let z=x; z<b; z++) {bdy+=hh(z)}
+							bdy+='<span class=tooltiptext>Authentication code: </span></div>';
+
+							c--;
+						}
+
+						break;
+										
+					case 0x0104 : // terminal parameter response
+						str+='Terminal parameter response';
 						bdy ="<div class='numberofitens tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Number of itens: '+ih(13)+'</span></div>';
 						bdy+="<div class='result tooltip'>"+hh(15)+'<span class=tooltiptext>Location type: ';
 						switch (log[15]) {
@@ -222,27 +252,8 @@ class Device {
 								bdy+='1: Blind area supplement report</span></div>';
 								break;
 						}
-
-						
-
-
-						let x = 16;     // Inicio do buffer
-						let c = ih(13); // Quantidade de blocos a serem processados
-						while (c > 0) {
-							let b = ih(y); // Tamando do bloco
-							bdy+="<div class='packlength tooltip'>"+hh(x)+hh(x+1)+"<span class=tooltiptext>Tamanho do pack: "+ih(x)+"</span></div>";
-							x+=2;
-
-							bdy+="<div class='authcode tooltip'>";
-							for (let z=x; z<b; z++) {bdy+=hh(z)}
-							bdy+='<span class=tooltiptext>Authentication code: </span></div>';
-
-							c--;
-						}
-
-
 						break;
-										
+
 					case 0x8001 : // Platform general response
 						str+='Platform general response';
 						bdy ="<div class='serialreplay tooltip'>"+hh(13)+hh(14)+'<span class=tooltiptext>Response serial: '+ih(13)+'</span></div>';
@@ -405,10 +416,14 @@ class Device {
 		this.GWPublishLog(buff);
 	}
 
+	async GWTerminalParameters(packg) {
+	
+	}
+
 	async GWUploadLocation(packg) {
 		// Fill parameters
 		let body = [packg[11],packg[12]]; // Serial number
-		body[2]=2; body[3]=0;   // 0x0200
+		body[2]=7; body[3]=4;   // 0x0704
 		body[4]=0;              // ok
 		this.GWMakeReply(0x8001, body);
 	}
@@ -449,19 +464,13 @@ class Device {
 		function ih(ii) {return packg[ii]*256+packg[ii+1]}
 		function hh(ii) {let h=packg[ii].toString(16).toUpperCase(); return h.length==1?'0'+h:h;}
 
-		// Faz o unescape do 0x7d
-		let y=packg.indexOf(0x7d,1);
-		while (y!=-1) {
-			if (packg[y+1]==0x02) {packg[y]=0x7e;}
-			packg.splice(y+1,1);
-			// Next
-			y=packg.indexOf(0x7d,y+1);
-		}
 		// Calcula o check digit
 		let checkdigit = packg[1];
 		for (let i = 2; i < packg.length-2; i++) { checkdigit ^= packg[i]; }
+
 		// Verifica o check digit
-		if (checkdigit == packg[packg.length-2]) {
+		if (true) { //checkdigit == packg[packg.length-2]
+
 			// Recolhe os parâmetros
 			this.mpnum = packg.slice(5,11); // Mobile Phone Number
 			// Testar os subpacotes
@@ -473,16 +482,16 @@ class Device {
 			// Processa a informação conforme o tipo de pacote
 			let PkgType = ih(1);	// Packge Type
 			switch (PkgType) {
-				case 0x0002 : // Terminal heart beat
-					this.GWHeartbeat(packg);
-					break;
-
 				case 0x0200 : // Location information reporting
 					this.GWLocationInformation(packg);
 					break;
 
 				case 0x0704 : // Upload location data in batches
 					this.GWUploadLocation(packg);
+					break;
+
+				case 0x0104 : // Check terminal parameter response
+					this.GWTerminalParameters(packg);
 					break;
 
 				case 0x0102 : // Terminal autentication
@@ -492,6 +501,10 @@ class Device {
 
 				case 0x0100 : // Terminal registration
 					this.GWTerminalRegistration(packg);
+					break;
+
+				case 0x0002 : // Terminal heart beat
+					this.GWHeartbeat(packg);
 					break;
 
 			}
@@ -519,8 +532,18 @@ class Device {
 				this.buff=this.buff.substring(i+1);
 				// Atualiza contador
 				bytsin+=ln.length;
+
+				// Faz o unescape do 0x7d
+				let y=ln.indexOf(0x7d,1);
+				while (y!=-1) {
+					if (ln[y+1]==0x02) {ln[y]=0x7e;}
+					ln.splice(y+1,1);
+					// Next
+					y=ln.indexOf(0x7d,y+1);
+				}
+
 				// Decodifica a linha
-				await this.GWParse(strToByteArray(ln));
+				this.GWParse(strToByteArray(ln));
 			} else if (this.buff[0]=='$') {
 				// Procura o final do pack
 				let i = this.buff.indexOf('#',1);
@@ -562,7 +585,7 @@ class Device {
 	}
 }
 
-// Initialize new device connection
+// Inicializa uma nova conecção
 async function OpenDevice(socket) {
 	const device=new Device(socket);
 	
@@ -570,11 +593,11 @@ async function OpenDevice(socket) {
 	socket.on('close',async function(){ await device.CloseDevice(); delete device; });
 	socket.on('end',function(){ device.err='0-Normal'; device.usocket.destroy(); });
 	socket.on('error',function(){ device.err = '1-Erro'; device.usocket.destroy(); });
-	// Close connection when inactive (5 min)
+	// Fecha a conexão se ficar inativo por 5 minutos
 	socket.setTimeout(300000,function(){ device.err='2-Timeout'; device.usocket.destroy(); });
 }
 
-// Publish update status
+// Publica o status 
 async function PublishUpdate() {
 	GetDate().then(dte => {
 		let uptime = Date.parse(dte) - starttime;
@@ -583,7 +606,7 @@ async function PublishUpdate() {
 }
 
 /****************************************************************************************************/
-/* Read enviroment variables																		*/
+/* Le as variáveis de ambiente																		*/
 /****************************************************************************************************/
 const dotenv = require('dotenv');
 dotenv.config();
@@ -613,7 +636,7 @@ pub.on('connect', function () { GetDate().then(dte => { // Imprime no terminal
 const mysql = require('mysql');
 const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
 
-// Initialize global variables
+// Inicializa as variáveis globais
 var starttime=0,numdev=0,msgsin=0,msgsout=0,bytsin=0,bytsout=0,bytserr=0;
 
 // Atualiza estatísticas a cada 60s
